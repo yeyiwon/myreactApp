@@ -1,6 +1,6 @@
-import PostList from "components/PostList"
-import AppBarHeader from "components/Header";
-import AppBottomNav from 'components/BottomNavigation';
+import PostList from "components/Post/PostList"
+import AppBarHeader from "components/LayOut/Header";
+import AppBottomNav from 'components/LayOut/BottomNavigation';
 
 export default function PostListPage(){
     return(

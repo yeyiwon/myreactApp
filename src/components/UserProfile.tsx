@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Avatar, Button } from '@mui/material';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { collection, onSnapshot, orderBy, query, where, doc, getDoc, updateDoc, arrayRemove, arrayUnion, addDoc, setDoc } from 'firebase/firestore';
+import { collection, onSnapshot, orderBy, query, where, doc, updateDoc, arrayRemove, arrayUnion, addDoc } from 'firebase/firestore';
 import { db } from 'firebaseApp';
-import ThemeContext from './ThemeContext';
-import { useContext } from 'react';
-import AppBarHeader from './Header';
-import { PostProps } from 'types/postTypes';
+import ThemeContext from '../Context/ThemeContext';
+import AppBarHeader from './LayOut/Header';
+import { PostProps, UserProps } from 'types/InterfaceTypes';
 import AuthContext from 'Context/AuthContext';
-import AppBottomNav from 'components/BottomNavigation';
+import AppBottomNav from 'components/LayOut/BottomNavigation';
+import { useCreateChatRoom } from './Chat/useCreateChatRoom';
 
 export default function UserProfile() {
     const { theme } = useContext(ThemeContext);
@@ -16,15 +16,27 @@ export default function UserProfile() {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [posts, setPosts] = useState<PostProps[]>([]);
-    const [profileUser, setProfileUser] = useState<any>(null);
+    const [profileUser, setProfileUser] = useState<UserProps | null>(null);
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
+    const { handleCreateRoom } = useCreateChatRoom();
 
+        const handleSendMessage = () => {
+        if (id) {
+            handleCreateRoom(id);
+        }
+    };
+    // 프로필 유저의 데이터가 실시간으로 반영되도록 수정
     useEffect(() => {
         if (id) {
             const userRef = doc(db, 'Users', id);
-            getDoc(userRef).then((snapshot) => {
-                const data = snapshot.data();
-                setProfileUser(data);
+
+            // 실시간으로 유저 데이터를 가져오기 위해 onSnapshot 사용
+            const unsubscribeUser = onSnapshot(userRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    setProfileUser(snapshot.data() as UserProps);
+                } else {
+                    setProfileUser(null); // 데이터가 없을 경우 처리
+                }
             });
 
             const postsRef = collection(db, "Posts");
@@ -34,7 +46,7 @@ export default function UserProfile() {
                 orderBy('createAt', "desc")
             );
 
-            const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
+            const unsubscribePosts = onSnapshot(postsQuery, (snapshot) => {
                 const postsData = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
@@ -42,19 +54,24 @@ export default function UserProfile() {
                 setPosts(postsData);
             });
 
-            return () => unsubscribe();
+            return () => {
+                unsubscribeUser(); // 구독 해제
+                unsubscribePosts();
+            };
         }
     }, [id]);
 
+    // 현재 사용자가 프로필 유저를 팔로우하고 있는지 확인하는 useEffect
     useEffect(() => {
         if (user?.uid && id) {
             const userDocRef = doc(db, 'Users', user.uid);
-            getDoc(userDocRef).then((userSnap) => {
-                if (userSnap.exists()) {
-                    const userData = userSnap.data();
-                    setIsFollowing(userData?.following?.includes(id));
-                }
+
+            const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
+                const userData = snapshot.data();
+                setIsFollowing(userData?.following?.includes(id));
             });
+
+            return () => unsubscribe(); // 구독 해제
         }
     }, [user, id]);
 
@@ -72,12 +89,6 @@ export default function UserProfile() {
                     await updateDoc(profileUserDocRef, {
                         followers: arrayRemove(user.uid),
                     });
-
-                    // 프로필 유저의 팔로워 수 업데이트
-                    setProfileUser((prev: any) => ({
-                        ...prev,
-                        followers: prev.followers?.filter((followerId: string) => followerId !== user.uid),
-                    }));
                 } else {
                     // 팔로우
                     await updateDoc(userDocRef, {
@@ -96,66 +107,16 @@ export default function UserProfile() {
                         content: '님이 회원님을 팔로우하기 시작했습니다.',
                         authorUid: user?.uid,
                     });
-
-                    // 프로필 유저의 팔로워 수 업데이트
-                    setProfileUser((prev: any) => ({
-                        ...prev,
-                        followers: [...(prev.followers || []), user.uid],
-                    }));
                 }
                 setIsFollowing(!isFollowing);
             } catch (error) {
-                console.error('Error updating follow status: ', error);
+                console.error('에러', error);
             }
         }
     };
-
-    const createChatRoom = async (userUid: string, profileUserUid: string): Promise<string> => {
-        try {
-            if (!userUid || !profileUserUid) {
-                throw new Error('User IDs are required.');
-            }
-
-            const chatRoomId = `${userUid}_${profileUserUid}`;
-            const chatRoomRef = doc(db, 'chatRooms', chatRoomId);
-
-            // 채팅방이 이미 존재하는지 확인
-            const docSnap = await getDoc(chatRoomRef);
-            if (docSnap.exists()) {
-                console.log('Chat room already exists.');
-                return chatRoomId;
-            }
-
-            // 새로운 채팅방 생성
-            await setDoc(chatRoomRef, {
-                users: [userUid, profileUserUid],
-            });
-
-            console.log('Chat room created successfully.');
-            return chatRoomId;
-        } catch (error) {
-            console.error('Error creating chat room: ', error);
-            throw error;
-        }
-    };
-
-const handleMessageClick = async () => {
-    if (!profileUser?.uid || !user?.uid) {
-        console.error('User information is missing.');
-        console.log('profileUser:', profileUser);
-        console.log('user:', user);
-        return;
-    }
-    try {
-        const chatRoomId = await createChatRoom(user.uid, profileUser.uid);
-        navigate(`/chat/${chatRoomId}`); // 채팅방 ID를 포함하여 리디렉션
-    } catch (error) {
-        console.error('Error handling message click: ', error);
-    }
-};
 
     const TabClick = (tab: string) => {
-        navigate(`/FollowingList/${id}?tab=${tab}`);
+        navigate(`/userFollowingList/${id}?tab=${tab}`);
     };
 
     return (
@@ -179,12 +140,12 @@ const handleMessageClick = async () => {
                         </div>
                         <div className='posting_followerBox'>
                             <span className='PostLength'>게시물 {posts.length}</span>
-                            <button className='follower_links_btn' onClick={() => TabClick('followers')}>
+                            <div className='follower_links_btn' onClick={() => TabClick('followers')}>
                                 팔로워 {profileUser?.followers?.length || 0}
-                            </button>
-                            <button className='follower_links_btn' onClick={() => TabClick('following')}>
+                            </div>
+                            <div className='follower_links_btn' onClick={() => TabClick('following')}>
                                 팔로잉 {profileUser?.following?.length || 0}
-                            </button>
+                            </div>
                         </div>
                         <div className='btnBox'>
                             <button 
@@ -193,7 +154,7 @@ const handleMessageClick = async () => {
                             >
                                 {isFollowing ? 'Unfollow' : 'Follow'}
                             </button>
-                            <button className='Profile_msgBtn' onClick={handleMessageClick}>
+                            <button className='Profile_msgBtn' onClick={handleSendMessage}>
                                 메세지
                             </button>
                         </div>

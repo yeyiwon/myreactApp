@@ -5,8 +5,8 @@ import { MdOutlineVisibility, MdOutlineVisibilityOff } from 'react-icons/md';
 import { createUserWithEmailAndPassword, getAuth, updateProfile } from 'firebase/auth'; 
 import { app, db } from 'firebaseApp'; 
 import { useNavigate } from 'react-router-dom';
-import ThemeContext from './ThemeContext';
-import { SuccessToast, ErrorToast } from './toastConfig';
+import ThemeContext from '../Context/ThemeContext';
+import { SuccessToast, ErrorToast } from '../Context/toastConfig';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, setDoc } from 'firebase/firestore';
 
@@ -187,7 +187,7 @@ const FuncSubmit = async () => {
         });
 
         SuccessToast('회원가입이 완료되었습니다 로그인을 해주세요', theme);
-        navigate('/Login');
+        navigate('/');
         
     } catch (error) {
         console.error("회원가입 오류: ", error);

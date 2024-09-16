@@ -4,11 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
 import { app } from 'firebaseApp';
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth';
-import { SuccessToast, ErrorToast  } from './toastConfig';
-import ThemeContext from 'components/ThemeContext';
+import { SuccessToast, ErrorToast  } from '../Context/toastConfig';
+import ThemeContext from 'Context/ThemeContext';
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from 'react-icons/fa';
 
+import { TiArrowLeft } from "react-icons/ti";
 
 export default function LoginForm() {
     const navigate = useNavigate();
@@ -18,7 +19,8 @@ export default function LoginForm() {
     const [loading, setLoading] = useState(false);
     const { theme } = useContext(ThemeContext);
     const [userName, setUserName] = useState<string | null>(null);
-    
+
+
     const FuncShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -108,10 +110,6 @@ export default function LoginForm() {
                         ),
                     }}
                 />
-                <div className='linkform'>
-                    계정이 없으신가요?
-                    <Link to='/Signup' className="form_link"> 회원가입하기 </Link>
-                </div>
                 <Button
                     sx={{
                         boxShadow: '1px 1px 5px 1px rgba(0,0,0,0.2)',
@@ -127,41 +125,41 @@ export default function LoginForm() {
                     LOGIN
                     
                 </Button>
-        {/* <div className='social-login'> */}
 
             <Divider sx={{ marginTop: '30px' }}> <p className="social-title">소셜 계정으로 간편 로그인</p> </Divider>
 
-            <div className='social_box'>
+
                 <Button
                     onClick={SocialLogin}
+                    fullWidth
                     name='google'
                     type="button"
-                    sx={{  background: '#fff', borderRadius: '50%', width: 50, height: 50, minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#F7F7F7', padding: 0 
+                    sx={{marginBottom: '10px', boxShadow: 3, color: "#000" ,height: 50, minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#F7F7F7', padding: 0, fontWeight: 'bold'
                     }}>
-                    <FcGoogle size={28} />
+                    <FcGoogle size={25} style={{ marginRight: '5px' }}/> Google
                 </Button>
                 <Button
                     name='github'
+                    fullWidth
                     onClick={SocialLogin}
                     type="button"
                     sx={{
+                        boxShadow: 3,
                         // background: 'rgba(0,0,0,0.2)',
-                        color: '#000000',
-                        borderRadius: '50%',
-                        width: 50,
+                        color: '#fff',
+                        fontWeight: 'bold',
                         height: 50, 
                         minWidth: 0, 
                         display: 'flex', 
-                        background: '#fff',
+                        backgroundColor: '#000',
                         justifyContent: 'center', 
                         alignItems: 'center',
                         
                         padding: 0 
                     }}>
-                        <FaGithub size={28}/>
+                        <FaGithub size={25} style={{ marginRight: '5px' }}/>      
+                        Github
                     </Button>
-                    
-                </div>
 
             </form>
         </div>

@@ -3,15 +3,16 @@ import { useContext, useEffect, useState } from "react";
 import { MdEdit, MdDelete } from 'react-icons/md';
 import { FaRegImage } from "react-icons/fa6";
 import AuthContext from "Context/AuthContext";
-import ThemeContext from "components/ThemeContext";
+import ThemeContext from "Context/ThemeContext";
 import { deleteObject, getDownloadURL, ref, uploadBytes, uploadString } from "@firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import { db, storage } from "firebaseApp";
 import { updateProfile } from "firebase/auth";
-import { ErrorToast, SuccessToast } from "components/toastConfig";
+import { ErrorToast, SuccessToast } from "Context/toastConfig";
 import { useNavigate } from "react-router-dom";
-import { doc, setDoc } from "firebase/firestore";
-import AppBarHeader from "components/Header";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
+import AppBarHeader from "components/LayOut/Header";
+import { UserProps,  } from "types/InterfaceTypes";
 
 
 
@@ -55,12 +56,7 @@ export default function ProfileEdit() {
             });
 
             // 혹시 몰라서 user의 정보까지 싹다 삭제 
-            // Firebase Auth와 Firestore에서 프로필 정보를 업데이트
-            const userRef = doc(db, 'Users', user.uid);
-            await setDoc(userRef, {
-                displayName: user.displayName || '',
-                photoURL: '' 
-            });
+            // Firebase Auth와 Firestore에서 프로필 정보를 업데이
             setImageUrl(null);
             SuccessToast('사진이 삭제되었습니다.', theme);
         } catch (error) {
@@ -77,7 +73,7 @@ export default function ProfileEdit() {
         }
     }, [user?.photoURL, user?.displayName]);
     // [user?.photoURL, user?.displayName]) useEffect로 얘네가 바뀌면 상태를 업뎃 하라 !
-
+// ProfileUpdate 함수 수정
 const ProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let newPhotoURL: string | null = null;
@@ -103,7 +99,7 @@ const ProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
 
             // Firestore의 'Users' 컬렉션에 사용자 정보 저장
             const userRef = doc(db, 'Users', user.uid);
-            await setDoc(userRef, {
+            await updateDoc(userRef, {
                 displayName: displayName || '',
                 photoURL: newPhotoURL || user.photoURL,
                 email: user.email || ''
@@ -118,8 +114,6 @@ const ProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
         ErrorToast('프로필 수정 실패', theme);
     }
 };
-
-
     return (
         <div>
             <AppBarHeader title="프로필 수정" showBackButton={true}/>

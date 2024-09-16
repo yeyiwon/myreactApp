@@ -2,13 +2,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Avatar, IconButton, Tooltip, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { getAuth, signOut } from 'firebase/auth';
 import { app, db } from 'firebaseApp';
-import ThemeContext from './ThemeContext';
+import ThemeContext from '../Context/ThemeContext';
 import { BiDoorOpen } from "react-icons/bi";
 import { Link, useNavigate } from 'react-router-dom';
-import { SuccessToast, ErrorToast } from './toastConfig';
+import { SuccessToast, ErrorToast } from '../Context/toastConfig';
 import AuthContext from 'Context/AuthContext';
-import { PostProps } from 'types/postTypes';
-import AppBottomNav from 'components/BottomNavigation';
+import { PostProps } from 'types/InterfaceTypes';
+import AppBottomNav from 'components/LayOut/BottomNavigation';
 import { collection, doc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import ConfirmDialog from './ConfirmDialog';
 
@@ -65,7 +65,7 @@ export default function ProfilePage() {
         try {
             await signOut(getAuth(app)); // 로그아웃 처리
             SuccessToast('로그아웃 완료', theme);
-            navigate('/login'); // 로그아웃 후 로그인 페이지로 이동
+            navigate('/'); // 로그아웃 후 로그인 페이지로 이동
         } catch (error) {
             ErrorToast('로그아웃 중 오류 발생', theme);
         }
@@ -73,7 +73,7 @@ export default function ProfilePage() {
     };
 
     const TabClick = (tab: string) => {
-        navigate(`/FollowingList/${user?.uid}?tab=${tab}`);
+        navigate(`/myFollowingList/?tab=${tab}`);
     };
 
     return (
@@ -93,7 +93,7 @@ export default function ProfilePage() {
                             </IconButton>
                         </Tooltip>
 
-                         <ConfirmDialog
+                        <ConfirmDialog
                         open={openLogoutDialog}
                         content="로그아웃 하시겠습니까?"
                         onConfirm={handleLogout}
@@ -111,16 +111,17 @@ export default function ProfilePage() {
                 </div>
                 <div className='posting_followerBox'>
                     <span className='PostLength'>게시물 {posts.length}</span>
-                    <button className='follower_links_btn'
+                    <div className='follower_links_btn'
                         onClick={() => TabClick('followers')}
                     >
                         팔로워 {followersCount}
-                    </button>
-                    <button className='follower_links_btn'
+                    </div>
+
+                    <div className='follower_links_btn'
                         onClick={() => TabClick('following')}
                     >
                         팔로잉 {followingCount}
-                    </button>
+                    </div>
                 </div>
                 <div>
                     <button className='Profile_msgBtn'
@@ -155,46 +156,6 @@ export default function ProfilePage() {
                 </ul>
             </div>
             <AppBottomNav />
-
-
-            {/* <Dialog open={openDialog} onClose={handleClose} PaperProps={{
-                style: {
-                    padding: '0.5em',
-                    borderRadius: 8,
-                    boxShadow: '0px 4px 24px rgba(0, 0, 0, 0.1)',
-                },
-            }}>
-                <DialogContent sx={{ textAlign: 'center', fontSize: '16px' }}>
-                    <p>로그아웃 하시겠습니까?</p>
-                </DialogContent>
-                <DialogActions sx={{ display: 'flex',
-                    justifyContent:'center',}}>
-                    <Button 
-                        onClick={handleClose} 
-                        fullWidth
-                        sx={{ 
-                            color: '#333', 
-                            backgroundColor: '#eee', 
-                            // borderRadius: 5, 
-                            '&:hover': { backgroundColor: '#ddd' }
-                        }}
-                    >
-                        취소
-                    </Button>
-                    <Button 
-                        fullWidth
-                        onClick={handleSignOut} 
-                        sx={{ 
-                            color: '#f7f7f7', 
-                            backgroundColor: '#580EF6', 
-                            // borderRadius: 5, 
-                            '&:hover': { backgroundColor: '#4d0dc6' }
-                        }}
-                    >
-                        로그아웃
-                    </Button>
-                </DialogActions>
-            </Dialog> */}
         </div>
     );
 }

@@ -3,18 +3,14 @@ import { Box } from '@mui/material';
 import Router from './components/Router';
 import { app } from './firebaseApp'; 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import LinearLoader from 'components/Loader';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
-import ThemeContext from 'components/ThemeContext'; 
+import ThemeContext from 'Context/ThemeContext'; 
 
-import LoadingScreen from 'components/LoadingScreen';
-
-import { View, Text, Image, StyleSheet } from 'react-native';
-import * as SplashScreen from 'expo-splash-screen';
-
-SplashScreen.preventAutoHideAsync();
+import LoadingScreen from 'components/Util/LoadingScreen';
+import { messaging } from './firebaseApp';
+// import { requestNotificationPermission } from './firebaseApp';
 
 
 // context API 란 컴포넌트 트리 전체에 데이터를 전역적으로 전달
@@ -38,18 +34,10 @@ function App() {
     // 현재는 항상 false 나갔다 오면 로그아웃이 되는 상태임 추후에 쿠키 로컬스토리지 세션 ? 할지 말지 고민중 
     // typescript 문법으로 useState<boolean>(false) 를 해서 true / false 의 값만 받기 위해 적어주는 공식임
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!auth?.currentUser);
-
-    useEffect(() => {
-    const hideSplashScreen = async () => {
-    await new Promise(resolve => setTimeout(resolve, 2000)); 
-        SplashScreen.hideAsync();
-        };
-
-        hideSplashScreen();
-    }, []);
-
+    
     // currentUser 가 있는 지 없는 지 useState<boolean>으로확인 
     useEffect(() => {
+        // requestNotificationPermission();
         //파이어베이스 실시간 확인 onAuthStateChanged
         onAuthStateChanged(auth, (user) => {
             if (user) {

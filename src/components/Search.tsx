@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import AppBottomNav from "./BottomNavigation";
+import AppBottomNav from "./LayOut/BottomNavigation";
 import { BiSearch } from "react-icons/bi";
 import { Avatar, Divider, InputAdornment, TextField } from "@mui/material";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
@@ -47,23 +47,18 @@ export default function Search() {
 
     return (
         <div style={{ paddingBottom: '56px' }}>
+            <div style={{ padding: '1em'}}>
             <div className="searchInput">
-                    <TextField
+                <BiSearch size={20}/>
+                    <input
                     type="search"
                         placeholder="유저 검색"
                         value={searchText}
                         className="Searchinputarea"
                         onChange={(e) => setSearchText(e.target.value)}
-                        InputProps={{
-                            startAdornment: (
-                            <InputAdornment position="start">
-                                <BiSearch size={18}/>
-                            </InputAdornment>
-                            ),
-                        }}
-                        fullWidth
                         />
 
+            </div>
             </div>
 
             <div className="Searchresults">

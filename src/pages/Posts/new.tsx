@@ -1,5 +1,5 @@
-import PostForm from "components/PostForm"
-import AppBarHeader from "components/Header";
+import PostForm from "components/Post/PostForm"
+import AppBarHeader from "components/LayOut/Header";
 
 export default function PostNew(){
     return(

@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import ProfilePage from 'components/Profile';
-import PostList from 'components/PostList';
-import AppBarHeader from "components/Header";
-import AppBottomNav from 'components/BottomNavigation';
+import PostList from 'components/Post/PostList';
+import AppBarHeader from "components/LayOut/Header";
+import AppBottomNav from 'components/LayOut/BottomNavigation';
 import AuthContext from 'Context/AuthContext';
 
 export default function Profile() {

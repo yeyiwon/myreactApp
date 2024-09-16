@@ -28,7 +28,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, title, content, onC
       onClose={onCancel} 
       PaperProps={{
         style: {
-          width: '230px',
+          width: '280px',
           padding: '0.5em',
           borderRadius: 8,
           boxShadow: '0px 4px 24px rgba(0, 0, 0, 0.1)',
@@ -36,11 +36,11 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, title, content, onC
       }}
     >
       {title && (
-        <DialogContent sx={{ textAlign: 'center', fontSize: '18px', fontWeight: 'bold' }}>
+        <DialogContent sx={{ textAlign: 'center', fontSize: '16px', fontWeight: 'bold' }}>
           <p>{title}</p>
         </DialogContent>
       )}
-      <DialogContent sx={{ textAlign: 'center', fontSize: '16px' }}>
+      <DialogContent sx={{ textAlign: 'center', fontSize: '16px', margin: 0 }}>
         <p>{content}</p>
       </DialogContent>
       <DialogActions sx={{ display: 'flex', justifyContent: 'center', gap: '2px' }}>

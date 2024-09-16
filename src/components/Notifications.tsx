@@ -2,11 +2,12 @@ import React, { useContext, useEffect, useState } from 'react';
 import { collection, query, where, orderBy, onSnapshot, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from 'firebaseApp';
 import AuthContext from 'Context/AuthContext';
-import AppBarHeader from './Header';
-import AppBottomNav from './BottomNavigation';
+import AppBarHeader from './LayOut/Header';
+import AppBottomNav from './LayOut/BottomNavigation';
 import { Avatar, Skeleton } from '@mui/material';
-import { formatDate } from './dateUtil';
+import { formatDate } from './Util/dateUtil';
 import { Link } from 'react-router-dom';
+import ThemeContext from '../Context/ThemeContext';
 
 interface UserData {
     displayName?: string;
@@ -29,6 +30,7 @@ export default function Notification() {
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
     const { user } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
+    const { theme } = useContext(ThemeContext);
 
     useEffect(() => {
         if (user) {
@@ -80,17 +82,17 @@ export default function Notification() {
     }, [user]);
 
     return (
-        <div className="NotificationArea">
+        <div className="NotificationArea" style={{ paddingBottom: '56px' }}>
             <AppBarHeader title="알림" showBackButton={true} />
             <div className="NotificationContent">
                 {loading ? (
                     <div className="NotificationList">
                         {Array.from(new Array(5)).map((_, index) => (
                             <li key={index} className="NotificationItemskel">
-                                <Skeleton variant="circular" width={40} height={40} />
+                                <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="circular" width={40} height={40} />
                                 <div className="NotificationText">
-                                    <Skeleton variant="text" width={200} height={20} />
-                                    <Skeleton variant="text" width={150} height={20} />
+                                    <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width={200} height={20} />
+                                    <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width={150} height={20} />
                                 </div>
                             </li>
                         ))}

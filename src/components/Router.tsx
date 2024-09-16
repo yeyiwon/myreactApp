@@ -10,11 +10,13 @@ import Login from 'pages/Login';
 import Signin from 'pages/SignIn';
 import ProfileEdit from 'pages/Profile/edit';
 import UserProfile from './UserProfile';
-import FollowingList from './followingList';
+import FollowingList from './myfollowingList';
 import Search from './Search';
 import Notification from './Notifications';
-import ChatRoom from './ChatRoom';
-import ChatList from './ChatList';
+import ChatRoom from './Chat/ChatRoom';
+import ChatList from './Chat/ChatList';
+import UserFollowingList from './UserFollowingList';
+import MainPage from './MainPage';
 
 interface RouterProps {
     isAuthenticated: boolean;
@@ -40,12 +42,15 @@ const Router: React.FC<RouterProps> = ({ isAuthenticated }) => {
                     <Route path="/Posts/edit/:id" element={<PostEdit />} />
                     
                     <Route path="/Profile" element={<Profile />} />
-                    <Route path="/FollowingList/:id" element={<FollowingList/>}/>
+                    <Route path="/myFollowingList" element={<FollowingList/>}/>
+                    <Route path="/userFollowingList/:id" element={<UserFollowingList/>}/>
                     <Route path="/Profile/edit" element={<ProfileEdit />} />
+
                     <Route path="/user/:id" element={<UserProfile />} />
 
                     <Route path="/Notification" element={<Notification/>} />
-                    <Route path="/chat/:id" element={<ChatRoom />} />
+                    <Route path="/chat/:roomId" element={<ChatRoom/>} />
+
                     <Route path="/chatlist" element={<ChatList />} />
 
 
@@ -53,10 +58,10 @@ const Router: React.FC<RouterProps> = ({ isAuthenticated }) => {
                 </>
             ) : (
                 <>
-
+                    <Route path='/MainPage' element={<MainPage/>}/>
                     <Route path="/Login" element={<Login />} />
                     <Route path="/Signup" element={<Signin />} />
-                    <Route path="*" element={<Navigate replace to="/Login" />} />
+                    <Route path="*" element={<Navigate replace to="/MainPage" />} />
                 </>
             )}
         </Routes>
