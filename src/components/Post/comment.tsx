@@ -118,7 +118,7 @@ const DeleteComment = async (data: CommentsInterface) => {
                         disabled={!comment}
                         className="commentbutton"
                     >
-                        <TiArrowUp color="#f7f7f7" size={25} />
+                        <TiArrowUp color="#f7f7f7" size={35} />
                     </button>
                 </form>
             </div>

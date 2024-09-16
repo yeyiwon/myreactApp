@@ -11,7 +11,7 @@ export default function MainPage(){
                 backgroundSize: 'cover', 
                 backgroundPosition: 'center', }} >
 
-        <h1 className='mainpagetitle'> 👋🏻 My SNS </h1>
+        <h1 className='mainpagetitle'> My SNS </h1>
 
 
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: "15px" }}>

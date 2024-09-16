@@ -202,22 +202,25 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
                   {otherUser?.photoURL ? (
                     <Avatar
                       src={otherUser.photoURL}
-                      alt={`${otherUser.displayName}'s profile`}
-                      style={{ borderRadius: '50%', width: '40px', height: '40px' }}
+                      alt={`${otherUser.displayName}`}
+                      style={{borderRadius: '50%', width: '40px', height: '40px'}}
                     />
                   ) : (
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#ccc' }} />
                   )}
                   <div>
-                  <p style={{ fontWeight: 'bold', color: '#333' }}>{otherUser?.displayName}
-                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: "10px" }}>
+                    <p style={{ fontWeight: 'bold', color: '#333' }}>{otherUser?.displayName}
+                    </p>
+                    <p style={{ fontSize: '12px', color: '#888' }}>{formatTimestamp(room.lastMessageTimestamp)}</p>
+                  </div>
                   <p className='lastmsg'>
                     {room?.lastMessage}
                   </p>
                   </div>
                 </div>
                 <div style={{ marginRight: '10px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
-                  <p style={{ fontSize: '12px', color: '#888' }}>{formatTimestamp(room.lastMessageTimestamp)}</p>
+                  
                   <p>{unreadMessagesCount > 0 && (
                   <Badge badgeContent={unreadMessagesCount} color='error' />
                 )}</p>

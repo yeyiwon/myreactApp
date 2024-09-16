@@ -215,7 +215,7 @@ export default function ChatRoom() {
                                         fontSize: '14px',
                                         alignItems: msg.senderId === user?.uid ? 'flex-end' : 'flex-start'
                                     }}>
-                                        { msg.senderId !== user?.uid ? <p style={{ fontSize: '12px', marginBottom: '5px',
+                                        { msg.senderId !== user?.uid ? <p style={{ fontSize: '12px', marginBottom: '5px', fontWeight: 'bold' ,
                                         color: theme === 'light' ? '#333' : '#F7F7F7',
                                     }}> {participant?.displayName} </p> : '' }
                                         
@@ -251,7 +251,7 @@ export default function ChatRoom() {
                 <div ref={messagesEndRef} />
             </div>
         <div className='textareabox_area'>
-            <form onSubmit={handleSubmit}  className='textareabox'>
+            <form onSubmit={handleSubmit} className='textareabox'>
                 <textarea
                     ref={textareaRef}
 
@@ -266,7 +266,7 @@ export default function ChatRoom() {
                     className='ChatBtn'
                     disabled={!newMessage.trim()}
                 >
-                    <TiArrowUp color="#f7f7f7" size={22} />
+                    <TiArrowUp color="#f7f7f7" size={30} />
                 </button>
             </form>
         </div>

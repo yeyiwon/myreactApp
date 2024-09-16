@@ -135,8 +135,8 @@ useEffect(() => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     
                     {context.theme === 'light' ? 
-                    <BiSun onClick={context.toggleMode} className='thememodeBtn' size={22} color="#424242"/> : 
-                    <BiMoon onClick={context.toggleMode} className='thememodeBtn' size={22} color="#F7F7F7"/> }
+                    <BiSun onClick={context.toggleMode} className='thememodeBtn' size={25} color="#424242"/> : 
+                    <BiMoon onClick={context.toggleMode} className='thememodeBtn' size={28} color="#F7F7F7"/> }
                     
     
                     <Link to={'/chatlist'}>
