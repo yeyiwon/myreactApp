@@ -20,7 +20,7 @@ export default function UserProfile() {
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
     const { handleCreateRoom } = useCreateChatRoom();
 
-        const handleSendMessage = () => {
+    const handleSendMessage = () => {
         if (id) {
             handleCreateRoom(id);
         }
@@ -35,7 +35,7 @@ export default function UserProfile() {
                 if (snapshot.exists()) {
                     setProfileUser(snapshot.data() as UserProps);
                 } else {
-                    setProfileUser(null); // 데이터가 없을 경우 처리
+                    setProfileUser(null);
                 }
             });
 

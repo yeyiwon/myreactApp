@@ -98,7 +98,7 @@ export default function ProfilePage() {
                         content="로그아웃 하시겠습니까?"
                         onConfirm={handleLogout}
                         onCancel={handleClose}
-                    />
+                        />
                 </div>
                 <Avatar
                     src={user?.photoURL || ''}

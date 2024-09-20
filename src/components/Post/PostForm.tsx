@@ -12,24 +12,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SuccessToast, ErrorToast } from '../../Context/toastConfig';
 import ThemeContext from "../../Context/ThemeContext";
 import { BiCamera } from "react-icons/bi";
+import { PostProps } from 'types/InterfaceTypes';
+
 import { formatDate } from '../Util/dateUtil';
 
 import ConfirmDialog from '../ConfirmDialog';
-
-export interface PostProps {
-    id?: string;
-    title: string;
-    email: string;
-    context: string;
-    createAt: string;
-    uid: string;
-    imageUrl: string;
-    displayName?: string;
-    profileUrl?: string;
-    likes?: string[];
-    likeCount?: number;
-    comment: string[];
-}
 
 export default function PostForm() {
     const [title, setTitle] = useState('');
@@ -42,12 +29,12 @@ export default function PostForm() {
     const { theme } = useContext(ThemeContext);
     const [post, setPost] = useState<PostProps | null>(null);
 
+    
     const [openLeaveDialog, setOpenLeaveDialog] = useState(false);
 
     const handleOpenLeaveDialog = () => setOpenLeaveDialog(true);
     const handleCloseLeaveDialog = () => setOpenLeaveDialog(false);
     const handleLeavePage = () => {
-        // 페이지 이동 처리 로직
         navigate('/');
     };
 

@@ -9,6 +9,7 @@ const Transition = React.forwardRef(function Transition(
   ref: React.Ref<unknown>,
 ) {
   return <Fade ref={ref} {...props} />;
+  // Fade 컴포넌트는 Material UI에서 제공하는 페이드 애니메이션 효과로, props와 ref를 전달하면서 반환된다.
 });
 
 
@@ -20,7 +21,10 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, title, content, onConfirm, onCancel }) => {
+// ConfirmDialog는 React.FC<ConfirmDialogProps>로 함수형 컴포넌트 타입을 명시해줌
+// open, title, content, onConfirm, onCancel 등의 props를 인자로 받아서 Dialog를 렌더링함
+
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, title, content, onConfirm, onCancel } : ConfirmDialogProps) => {
   return (
     <Dialog 
       open={open} 

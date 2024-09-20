@@ -6,17 +6,11 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "firebaseApp";
 import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from "Context/AuthContext";
-
-interface User {
-    id: string;
-    displayName: string;
-    email: string;
-    photoURL?: string;
-}
+import { UserProps } from "types/InterfaceTypes";
 
 export default function Search() {
     const [searchText, setSearchText] = useState<string>("");
-    const [results, setResults] = useState<User[]>([]);
+    const [results, setResults] = useState<UserProps[]>([]);
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -34,9 +28,9 @@ export default function Search() {
         );
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const users: User[] = [];
+            const users: UserProps[] = [];
             querySnapshot.forEach((doc) => {
-                const data = doc.data() as User;
+                const data = doc.data() as UserProps;
                 users.push({ ...data, id: doc.id });
             });
             setResults(users);

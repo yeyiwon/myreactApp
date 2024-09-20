@@ -8,23 +8,7 @@ import { Avatar, Skeleton } from '@mui/material';
 import { formatDate } from './Util/dateUtil';
 import { Link } from 'react-router-dom';
 import ThemeContext from '../Context/ThemeContext';
-
-interface UserData {
-    displayName?: string;
-    photoURL?: string;
-}
-
-interface NotificationType {
-    id: string;
-    uid: string; 
-    isRead: boolean;
-    createdAt: string;
-    url: string;
-    content: string;
-    authorUid: string; 
-    authorDisplayName?: string; 
-    authorProfileUrl?: string; 
-}
+import { NotificationType, UserProps } from 'types/InterfaceTypes';
 
 export default function Notification() {
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
@@ -54,7 +38,7 @@ export default function Notification() {
                             const authorDoc = await getDoc(authorDocRef);
 
                             if (authorDoc.exists()) {
-                                const authorData = authorDoc.data() as UserData;
+                                const authorData = authorDoc.data() as UserProps;
                                 notificationsData.push({
                                     ...data,
                                     authorDisplayName: authorData.displayName,

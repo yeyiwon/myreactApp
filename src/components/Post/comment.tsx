@@ -12,6 +12,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { formatDate } from '../Util/dateUtil';
 import { CommentsInterface, PostProps } from 'types/InterfaceTypes';
 
+import ConfirmDialog from "../ConfirmDialog";
+
 interface CommentsProps{
     post: PostProps;
     getPost: (id: string) => void;
@@ -22,6 +24,15 @@ export default function Comment({post, getPost} : CommentsProps){
     const {user } = useContext(AuthContext);
     const {theme } = useContext(ThemeContext)
     const navigate = useNavigate();
+    const [selectedComment, setSelectedComment] = useState<CommentsInterface | null>(null);  // 삭제할 댓글 정보
+    const [openDialog, setOpenDialog] = useState(false);
+
+    // ConfirmDialog 열기/닫기
+    const handleClickOpen = (comment: CommentsInterface) => {
+        setSelectedComment(comment);  // 삭제할 댓글 저장
+        setOpenDialog(true); 
+    };
+    const handleClose = () => setOpenDialog(false);
     
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const {
@@ -78,24 +89,22 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         }
     };
 
-const DeleteComment = async (data: CommentsInterface) => {
-    const confirm = window.confirm('해당 댓글을 삭제하시겠습니까?');
-    if (confirm && post.id) {
-        try {
-            const postRef = doc(db, 'Posts', post.id);
-            await updateDoc(postRef, {
-                comments: arrayRemove({
-                    ...data
-                })
-            });
-            SuccessToast('댓글을 삭제했습니다', theme);
-            await getPost(post.id);
-        } catch (error) {
-            console.error('댓글 삭제 오류:', error);
-            ErrorToast('댓글 삭제 실패', theme);
+const DeleteComment = async () => {
+        if (selectedComment && post?.id) {
+            try {
+                const postRef = doc(db, 'Posts', post.id);
+                await updateDoc(postRef, {
+                    comments: arrayRemove(selectedComment)
+                });
+                SuccessToast('댓글을 삭제했습니다', theme);
+                await getPost(post.id);
+                handleClose();  // Dialog 닫기
+            } catch (error) {
+                console.error('댓글 삭제 오류:', error);
+                ErrorToast('댓글 삭제 실패', theme);
+            }
         }
-    }
-};
+    };
 
 
 
@@ -161,17 +170,24 @@ const DeleteComment = async (data: CommentsInterface) => {
                                             top: '50%',
                                             transform: 'translateY(-50%)',
                                         }}
-                                        onClick={() => DeleteComment(comment)}
+                                        onClick={() => handleClickOpen(comment)}
                                     >
                                         <FaRegTrashAlt size={16} />
                                     </IconButton>
                                 </Tooltip>
+                                
                             )}
 
                         </div>
                     </li>
                 ))}
             </ul>
+                    <ConfirmDialog
+                        open={openDialog}
+                        content="댓글을 삭제하시겠습니까?"
+                        onConfirm={DeleteComment}
+                        onCancel={handleClose}
+                        />
         </div>
     );
 }

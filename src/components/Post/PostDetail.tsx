@@ -16,8 +16,6 @@ import { formatDate } from '../Util/dateUtil';
 import LoadingScreen from '../Util/LoadingScreen';
 import ConfirmDialog from "../ConfirmDialog";
 
-
-
 import Comment from "./comment";
 
 import ReactMarkDown from 'react-markdown'
@@ -34,8 +32,8 @@ export default function PostDetail() {
     const { user } = useContext(AuthContext);
 
     const handleDeleteClick = () => {
-    setOpenDialog(true); // Open the confirmation dialog
-  };
+    setOpenDialog(true);
+    };
 
     const handleConfirmDelete = async () => {
         try {

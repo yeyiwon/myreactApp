@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { TiArrowUp } from "react-icons/ti";
 import AppBarHeader from '../LayOut/Header';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import AuthContext from 'Context/AuthContext';
 import ThemeContext from '../../Context/ThemeContext';
 import { collection, onSnapshot, addDoc, query, orderBy, getDoc, doc, updateDoc, getDocs, writeBatch, where } from 'firebase/firestore';
@@ -40,7 +40,8 @@ export default function ChatRoom() {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages]);
- useEffect(() => {
+
+useEffect(() => {
         if (roomId && user?.uid) {
             const chatRoomDoc = doc(db, 'ChatRooms', roomId);
             const messagesCollection = collection(db, `ChatRooms/${roomId}/Messages`);
@@ -193,7 +194,7 @@ export default function ChatRoom() {
                                     animation: 'fadeIn 0.3s ease-in-out'
                                 }}>
                             {msg.senderId !== user?.uid && (
-                                    
+                                    <Link to={`/user/${msg.senderId}`}>
                                     <Avatar
                                         src={participant?.photoURL}
                                         alt={`${participant?.displayName}'s profile`}
@@ -206,6 +207,7 @@ export default function ChatRoom() {
                                             marginLeft: msg.senderId === user?.uid ? '10px' : '0px' 
                                         }}
                                     />
+                                    </Link>
                                     
                                 )}
                                     

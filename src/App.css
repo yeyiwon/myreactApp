@@ -751,12 +751,13 @@ login-title {
 /* 알림  */
 .NotificationArea{
   padding: 1em;
+  color: rgb(247, 247, 247);
   padding-bottom: 64px;
 }
 .NotificationArea {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  /* height: 100vh; */
 }
 
 .NotificationContent {
@@ -1307,7 +1308,7 @@ login-title {
 }
 
 .Searchresults{
-  padding: 1em;
+  padding: 0.5em;
   box-sizing: border-box;
 }
 .SearchArea{

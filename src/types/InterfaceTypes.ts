@@ -7,9 +7,48 @@ export interface UserProps {
   followers: string[];
   photoURL: string;
   chatRooms?: string[];
-
 }
 
+export interface PostProps {
+    title: string;
+    email: string;
+    context: string;
+    createAt: string;
+    id?: string;
+    uid: string;
+    imageUrl: string;
+    displayName?: string;
+    profileUrl?: string;
+    photoURL?: string;
+    likes?: string[];
+    likeCount?: number; 
+    comments?: CommentsInterface[]; 
+    lastModifyAt: string;
+    backgroundColor?: string;
+}
+
+export interface PostWithAuthor extends PostProps {
+    authorDisplayName?: string;
+    authorProfileUrl?: string;
+}
+
+
+
+
+
+export interface Message {
+  id: string;
+  text: string;
+  senderId: string;
+  senderProfilePic: string;
+  senderName: string;
+  lastMessage: string,
+  isRead: boolean;
+  isCurrentUser?: boolean; 
+  timestamp: { seconds: number };
+  lastMessageTimestamp?: { seconds: number };
+
+}
 
 export interface ChatRoomProps {
   id: string;
@@ -20,26 +59,9 @@ export interface ChatRoomProps {
   otherUser?: UserProps;  // 상대방 정보 추가
   messageCount?: number;
   unreadMessages?: Record<string, number>;
-  unreadMessagesCount?: number; // 총 unread 메시지 수
+  unreadMessagesCount?: number;
   lastMessageTimestamp?: { seconds: number };
 }
-
-
-export interface Message {
-  id: string;
-  text: string;
-  senderId: string;
-  senderProfilePic: string;
-  senderName: string;
-  lastMessage: string,
-  timestamp: { seconds: number };
-  isRead: boolean;
-  isCurrentUser?: boolean; 
-  lastMessageTimestamp?: { seconds: number };
-
-}
-
-
 
 
 export interface NotificationType {
@@ -77,25 +99,3 @@ export interface FollowInfoWithUser {
     following: FollowInfo;  
 }
 
-export interface PostProps {
-    id?: string;
-    title: string;
-    email: string;
-    context: string;
-    createAt: string;
-    uid: string;
-    imageUrl: string;
-    displayName?: string;
-    profileUrl?: string;
-    photoURL?: string;
-    likes?: string[];
-    likeCount?: number;
-    backgroundColor?: string; 
-    comments?: CommentsInterface[]; 
-    lastModifyAt: string;
-}
-
-export interface PostWithAuthor extends PostProps {
-    authorDisplayName?: string;
-    authorProfileUrl?: string;
-}

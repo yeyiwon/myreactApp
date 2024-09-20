@@ -22,7 +22,7 @@ export function useCreateChatRoom() {
             // 이미 존재하는 방이 있는지 확인
             const existingRoom = chatRoomsSnapshot.docs.find(doc => {
                 const roomData = doc.data();
-                if (roomData?.users) { // corrected from participants to users
+                if (roomData?.users) { 
                     return roomData.users.includes(user.uid) && roomData.users.includes(targetUserId);
                 }
                 return false;
@@ -39,8 +39,8 @@ export function useCreateChatRoom() {
                 users: [user.uid, targetUserId],
                 lastMessage: "", 
                 unreadMessages: {
-                    [user.uid]: 0, // Initial unread messages count for current user
-                    [targetUserId]: 0, // Initial unread messages count for target user
+                    [user.uid]: 0,
+                    [targetUserId]: 0, 
                 },
             });
 

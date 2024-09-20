@@ -56,7 +56,7 @@ export default function MyFollowingList() {
                     setFollowers(followersDetails);
                 }
             } catch (error) {
-                console.error("Error fetching user data: ", error);
+                console.error(error);
             } finally {
                 setLoading(false);
             }
@@ -150,13 +150,18 @@ export default function MyFollowingList() {
                 <div role="tabpanel">
                     {loading ? (
                         <div className="Searchresults">
+
                             <ul className='SearchArea'>
                                 {[...Array(5)].map((_, index) => (
-                                    <li key={index} style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <li key={index} style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'space-between', padding: '1em' }}>
                                         <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="circular" width={50} height={50} />
                                         <div style={{ flex: 1 }}>
-                                            <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width="60%" />
-                                            <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width="40%" />
+                                            <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width={100} />
+                                            <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width={150} />
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '10px' }}>
+                                            <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width={60} height={50} />
+                                            <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width={60} height={50} />
                                         </div>
                                     </li>
                                 ))}

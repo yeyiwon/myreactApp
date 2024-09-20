@@ -27,7 +27,7 @@ export default function UserFollowingList() {
                 const followersData = await Promise.all(followersPromises);
                 setFollowers(followersData.filter(Boolean) as FollowInfo[]);
             } catch (error) {
-                console.error('Error fetching followers:', error);
+                console.error(error);
             }
         }
     };
@@ -42,7 +42,7 @@ export default function UserFollowingList() {
                 const followingData = await Promise.all(followingPromises);
                 setFollowing(followingData.filter(Boolean) as FollowInfo[]);
             } catch (error) {
-                console.error('Error fetching following:', error);
+                console.error(error);
             }
         }
     };
@@ -50,8 +50,6 @@ export default function UserFollowingList() {
     useEffect(() => {
         if (id) {
             const userRef = doc(db, 'Users', id);
-
-            // Fetch user info
             const fetchUserInfo = async () => {
                 try {
                     const userDoc = await getDoc(userRef);
@@ -59,20 +57,19 @@ export default function UserFollowingList() {
                         setUserInfo(userDoc.data() as UserProps);
                     }
                 } catch (error) {
-                    console.error('Error fetching user info:', error);
+                    console.error(error);
                 }
             };
 
-            fetchUserInfo(); // Fetch user info on mount
+            fetchUserInfo(); 
             setLoading(false);
 
-            // Watch for changes in user info
             const unsubscribe = onSnapshot(userRef, (doc) => {
                 setUserInfo(doc.data() as UserProps);
             });
 
             return () => {
-                unsubscribe(); // Cleanup subscription
+                unsubscribe();
             };
         }
     }, [id]);
@@ -130,11 +127,11 @@ export default function UserFollowingList() {
                         <div className="Searchresults">
                             <ul className='SearchArea'>
                                 {[...Array(5)].map((_, index) => (
-                                    <li key={index} style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <li key={index} style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'space-between', padding: '1em' }}>
                                         <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="circular" width={50} height={50} />
                                         <div style={{ flex: 1 }}>
-                                            <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width="60%" />
-                                            <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width="40%" />
+                                            <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width={100} />
+                                            <Skeleton sx={{ background: theme === 'light' ? '' : '#888' }} variant="text" width={150} />
                                         </div>
                                     </li>
                                 ))}
@@ -162,6 +159,7 @@ export default function UserFollowingList() {
                                                     </div>
                                                 </div>
                                             </Link>
+                                            
                                         </li>
                                     )) : (
                                         <p className="noPostlist">팔로워가 없습니다.</p>
