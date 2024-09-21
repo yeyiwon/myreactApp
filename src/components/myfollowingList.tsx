@@ -19,7 +19,7 @@ export default function MyFollowingList() {
     const [followers, setFollowers] = useState<FollowInfo[]>([]);
     const [following, setFollowing] = useState<FollowInfo[]>([]);
     const navigate = useNavigate();
-    const { handleCreateRoom } = useCreateChatRoom();
+    const { CreateRoom } = useCreateChatRoom();
 
 
     useEffect(() => {
@@ -89,6 +89,8 @@ export default function MyFollowingList() {
         setFollowing(prev => prev.filter(f => f.id !== userId));
         setFollowers(prev => prev.filter(f => f.id !== userId));
     };
+
+    
 
     // 팔로워 삭제: 상대방의 팔로워 목록과 나의 팔로워 목록에서 제거
     const handleRemoveFollower = async (followerId: string) => {
@@ -200,7 +202,7 @@ export default function MyFollowingList() {
                                             <div style={{ display: 'flex', gap: '10px' }}>
                                             <button
                                                 className='PostList_following'
-                                                onClick={() => handleCreateRoom(follower.id)} // 메시지 보내기
+                                                onClick={() => CreateRoom(follower.id)} // 메시지 보내기
                                             >
                                                 메시지
                                             </button>
@@ -244,7 +246,7 @@ export default function MyFollowingList() {
                                             <div style={{ display: 'flex', gap: '10px' }}>
                                             <button
                                                 className='PostList_following'
-                                                onClick={() => handleCreateRoom(followingUser.id)} // 메시지 보내기
+                                                onClick={() => CreateRoom(followingUser.id)} // 메시지 보내기
                                             >
                                                 메시지
                                             </button>

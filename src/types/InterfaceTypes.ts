@@ -7,6 +7,7 @@ export interface UserProps {
   followers: string[];
   photoURL: string;
   chatRooms?: string[];
+  visitorMessages?: { message: string; createdAt: Date }[];
 }
 
 export interface PostProps {
@@ -32,10 +33,6 @@ export interface PostWithAuthor extends PostProps {
     authorProfileUrl?: string;
 }
 
-
-
-
-
 export interface Message {
   id: string;
   text: string;
@@ -56,9 +53,9 @@ export interface ChatRoomProps {
   users: string[]; // 유저 ID 목록
   photoURL?: string;
   Message: Message[];
-  otherUser?: UserProps;  // 상대방 정보 추가
+  otherUser?: UserProps;
   messageCount?: number;
-  unreadMessages?: Record<string, number>;
+  unreadMessages?: Record<string, number>; // 모든 키는 문자열 넘버 임 
   unreadMessagesCount?: number;
   lastMessageTimestamp?: { seconds: number };
 }
@@ -66,7 +63,7 @@ export interface ChatRoomProps {
 
 export interface NotificationType {
     id: string;
-    uid: string; // 알림을 받을 사용자 
+    uid: string; 
     isRead: boolean;
     createdAt: string;
     url: string;

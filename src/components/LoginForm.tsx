@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Button, TextField, IconButton, InputAdornment, Divider } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
-import { app } from 'firebaseApp';
+import { app, db } from 'firebaseApp';
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth';
 import { SuccessToast, ErrorToast  } from '../Context/toastConfig';
 import ThemeContext from 'Context/ThemeContext';
@@ -10,6 +10,8 @@ import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from 'react-icons/fa';
 
 import { TiArrowLeft } from "react-icons/ti";
+import { Firestore, doc, setDoc } from 'firebase/firestore';
+import { UserProps } from 'types/InterfaceTypes';
 
 export default function LoginForm() {
     const navigate = useNavigate();
@@ -35,21 +37,37 @@ export default function LoginForm() {
 
         if (name === 'google') {
             provider = new GoogleAuthProvider();
+            provider.addScope('email');
+            
         }
         if (name === 'github') {
             provider = new GithubAuthProvider(); 
+            provider.addScope('email');
         }
 
-        await signInWithPopup(auth, 
-            provider as GoogleAuthProvider | GithubAuthProvider
-            ).then((res) => {
-            const user = res.user;
+        if(provider) {
+            try {
+                const res = await signInWithPopup(auth, provider);
+                const user = res.user;
 
-            console.log(res);
-            SuccessToast(`${user?.displayName}` + '님 환영합니다' , theme);
-        }).catch((error) => {
-            ErrorToast('로그인 실패', theme)
-        })
+                const email = user.email; 
+                console.log('User email:', email); 
+
+                const userData = {
+                    id: user.uid, 
+                    displayName: user.displayName,
+                    PhotoURL: user.photoURL,
+                    email: user?.email,
+                };
+
+                
+                const userRef = doc(db, "Users", user.uid);
+                await setDoc(userRef, userData);
+                SuccessToast(`${user.displayName}님 환영합니다`, theme)
+            }catch(error){
+                ErrorToast('로그인 실패', theme)
+            }
+        }
     }
 
     // e React.FormEvent<HTMLFormElement> 객체가 폼 제출과 관련된 이벤트라는 것 TypeScript는 이 타입에 맞는 속성과 메서드를 제공

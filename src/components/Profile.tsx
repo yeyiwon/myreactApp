@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Avatar, IconButton, Tooltip, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Avatar, IconButton, Tooltip, Button, Dialog, DialogActions, DialogContent, DialogTitle, Tabs, Tab } from '@mui/material';
 import { getAuth, signOut } from 'firebase/auth';
 import { app, db } from 'firebaseApp';
 import ThemeContext from '../Context/ThemeContext';
@@ -10,7 +10,8 @@ import AuthContext from 'Context/AuthContext';
 import { PostProps } from 'types/InterfaceTypes';
 import AppBottomNav from 'components/LayOut/BottomNavigation';
 import { collection, doc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
-import ConfirmDialog from './ConfirmDialog';
+import ConfirmDialog from './Util/ConfirmDialog';
+import { LuSmilePlus } from "react-icons/lu";
 
 export default function ProfilePage() {
     const { theme } = useContext(ThemeContext);
@@ -131,29 +132,30 @@ export default function ProfilePage() {
                     </button>
                 </div>
             </div>
-            <div className="ProfileMypostContainer">
-                <h3 className='ProfiePost_list_title'> Post </h3>
-                
-                <ul className='ProfiePost_list'>
-                    {posts.length > 0 ? posts.map(post => (
-                    <Link to={`/Posts/${post?.id}`} key={post.id}>
-                        <li className="Profile_post_box">
-                            <h3 className='Profile_post_box_title'>{post.title}</h3>
-                            <div className="Profile_post_image" style={{ 
-                                width: '100%', height: '100%',
-                                backgroundColor: post.backgroundColor || '#ffffff' }}>
-                                {post?.imageUrl ? (
-                                    <img src={post.imageUrl} alt="Post" />
-                                ) : (
-                                    null
-                                )}
-                            </div>
-                        </li>
-                        </Link>
-                    )) : (
-                        <p className="NoNotifications"> 게시물이 없습니다. </p>
-                    )}
-                </ul>
+            <div>
+                <div className="ProfileMypostContainer">
+                    <h3 className='ProfiePost_list_title'> Post </h3>
+                    <ul className='ProfiePost_list'>
+                        {posts.length > 0 ? posts.map(post => (
+                        <Link to={`/Posts/${post?.id}`} key={post.id}>
+                            <li className="Profile_post_box">
+                                <h3 className='Profile_post_box_title'>{post.title}</h3>
+                                <div className="Profile_post_image" style={{ 
+                                    width: '100%', height: '100%',
+                                    backgroundColor: post.backgroundColor || '#ffffff' }}>
+                                    {post?.imageUrl ? (
+                                        <img src={post.imageUrl} alt="Post" />
+                                    ) : (
+                                        null
+                                    )}
+                                </div>
+                            </li>
+                            </Link>
+                        )) : (
+                            <p className="NoNotifications"> 게시물이 없습니다. </p>
+                        )}
+                    </ul>
+                </div>
             </div>
             <AppBottomNav />
         </div>

@@ -54,6 +54,7 @@ function App() {
     return (
         // 컨텍스트 안에 테마가 !
         <div className={context.theme == "light" ? "light" : "dark"}>
+            
             <ToastContainer stacked />
             <Box>
                 <Box>

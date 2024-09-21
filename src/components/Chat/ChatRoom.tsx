@@ -9,12 +9,12 @@ import { db } from 'firebaseApp';
 import { ChatRoomProps, UserProps, Message } from 'types/InterfaceTypes';
 import { Avatar, Divider } from '@mui/material';
 
-// 날짜를 포맷팅하는 헬퍼 함수 
+// 날짜를 포맷
 const formatDate = (date: Date) => {
     return date.toLocaleDateString();
 };
 
-// 시간을 포맷팅하는 헬퍼 함수 
+// 시간을 포맷팅
 export const formatTime = (date: Date) => {
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -27,7 +27,6 @@ export default function ChatRoom() {
     const [newMessage, setNewMessage] = useState('');
     const [chatRoom, setChatRoom] = useState<ChatRoomProps | null>(null);
     const [participant, setParticipant] = useState<UserProps | null>(null);
-    const [keyboardHeight, setKeyboardHeight] = useState(0);
     const { theme } = useContext(ThemeContext);
     const { user } = useContext(AuthContext);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -41,39 +40,43 @@ export default function ChatRoom() {
         }
     }, [messages]);
 
-useEffect(() => {
+    useEffect(() => {
         if (roomId && user?.uid) {
+            // 룸 아이디와 현재 로그인한 사용자 uid가 있을 때만 얘네 둘다 없으면 사용 안함
             const chatRoomDoc = doc(db, 'ChatRooms', roomId);
             const messagesCollection = collection(db, `ChatRooms/${roomId}/Messages`);
-            const q = query(messagesCollection, orderBy('timestamp'));
-
-            const unsubscribeMessages = onSnapshot(q, async (snapshot) => {
-                const newMessages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Message[];
-
-                setMessages(prevMessages => {
-                    const existingMessageIds = new Set(prevMessages.map(msg => msg.id));
-                    const filteredNewMessages = newMessages.filter(msg => !existingMessageIds.has(msg.id));
-                    return [...prevMessages, ...filteredNewMessages];
-                });
+            // messagesCollection 에 메세지들을 담아서 타임스탬프 기준으로 정렬
+            const sortmsg = query(messagesCollection, orderBy('timestamp'));
+            // 정렬을 먼저 해놓고 실시간으로 받는 이유는 새로운 메시지가 추가되거나 기존 메시지가 업데이트될 때마다 자동으로 반영되게 하기 위함
+        const filterMessages = onSnapshot(sortmsg, async (snapshot) => {
+                const newMessages = snapshot.docs.map(msg => ({ id: msg.id, ...msg.data() })) as Message[];
+                console.log(newMessages)
+                // 얘는 지금 채팅방의 전체메세지 내용 
+                setMessages(newMessages);
 
                 const unreadMessages = newMessages.filter(msg => msg.senderId !== user.uid && !msg.isRead);
+                // 현재 로그인 한 사용자가 보낸 게 아닐 경우에 안 읽음 처리가 필요하고 
+                // 안 읽은 내용만 모아둘라고 unreadMessages 에 담기 
+                // 그 길이가 0 보다 길때 
                 if (unreadMessages.length > 0) {
                     const batch = writeBatch(db);
+                    // writeBatch 요친구가 한 번에 일처리르 해주는 아이라함
                     unreadMessages.forEach(msg => {
                         const messageRef = doc(db, `ChatRooms/${roomId}/Messages`, msg.id);
-                        batch.update(messageRef, { isRead: true });
-                    });
-                    await batch.commit();
-                }
+                        // 여기서 또 foEach를 도는 이유 unreadMessages 얘는 배열이라 오류가 났음 객체로 또 분리하여 작업하기 위해 forEach ehfr
 
-                await updateDoc(chatRoomDoc, {
-                    [`unreadMessages.${user.uid}`]: 0
-                }).catch((error) => {
-                    console.error('Error marking messages as read:', error);
-                });
+                    batch.update(messageRef, { isRead: true });
+                    });
+
+                    await batch.commit();
+                    await updateDoc(chatRoomDoc, {
+                        [`unreadMessages.${user.uid}`]: 0
+                        // 디비 카운트 0 까지 확실한 마무리
+                    })
+                }
             });
 
-            const unsubscribeChatRoom = onSnapshot(chatRoomDoc, async (snapshot) => {
+            const updateChatRoom = onSnapshot(chatRoomDoc, async (snapshot) => {
                 const chatRoomData = snapshot.data() as ChatRoomProps;
                 setChatRoom(chatRoomData);
 
@@ -88,17 +91,21 @@ useEffect(() => {
             });
 
             return () => {
-                unsubscribeMessages();
-                unsubscribeChatRoom();
+                filterMessages();
+                updateChatRoom();
             };
         }
     }, [roomId, user?.uid]);
+    // 읽음 안 읽음에 관해선 useEffect 가 해주는 원리라서 
+    // roomId나 user.uid가 변경될 때마다 실행됨 얘네 둘 실행 
+    // filterMessages();updateChatRoom();
 
-    const handleSendMessage = async () => {
-        if (newMessage.trim() && user?.uid && roomId) {
-            try {
+    const SendMessage = async () => {
+        if (user?.uid && roomId) {
                 const messagesCollection = collection(db, `ChatRooms/${roomId}/Messages`);
+                // ChatRooms/${roomId}/Messages 여기 배열에 들어갈 것이기 때문에 경로 명확히 지정하기 !! 
                 await addDoc(messagesCollection, {
+                    // 메세지 데베에 들어갈 내용들 
                     text: newMessage,
                     senderId: user.uid,
                     timestamp: new Date(),
@@ -107,7 +114,8 @@ useEffect(() => {
                     senderName: user.displayName,
                 });
 
-                setNewMessage('');
+                setNewMessage(''); 
+                // 메세지 전송 후 상태 초기화 + 커서 포커스
                 textareaRef.current?.focus();
 
                 const chatRoomDoc = doc(db, 'ChatRooms', roomId);
@@ -115,40 +123,39 @@ useEffect(() => {
                 const chatRoomData = chatRoomSnap.data() as ChatRoomProps;
 
                 if (chatRoomData.users) {
+                    // 사용자 목록 확인하고 ! 유저 아이디 제외한 나머지 사용자 데려오기 
                     const participantIds = chatRoomData.users.filter(id => id !== user.uid);
                     const updates: { [key: string]: any } = {
                         lastMessage: newMessage,
                         lastMessageTimestamp: new Date(),
+                        
                     };
                     participantIds.forEach(participantId => {
                         updates[`unreadMessages.${participantId}`] = (chatRoomData.unreadMessages?.[participantId] ?? 0) + 1;
+                    
                     });
 
                     await updateDoc(chatRoomDoc, updates);
                 } else {
                     console.error('채팅방의 사용자 목록이 존재하지 않습니다.');
-                }
-
-            } catch (error) {
-                console.error('메시지 전송 중 오류 발생:', error);
             }
         } else {
             console.error('메시지나 사용자 정보가 없습니다.');
         }
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        handleSendMessage();
+        SendMessage();
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+    const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter') {
             e.preventDefault();
-            handleSendMessage();
+            SendMessage();
         }
     };
-
+    
     const groupedMessages = messages.reduce((acc, msg, index) => {
         const date = new Date(msg.timestamp.seconds * 1000);
         const dateString = formatDate(date);
@@ -169,7 +176,7 @@ useEffect(() => {
 
     return (
         <div>
-            <div className='chatContent' style={{overflowY: 'scroll', paddingBottom: '55px', display: 'flex', justifyContent: 'flex-end' }}>
+            <div className='chatContent' style={{overflowY: 'hidden', paddingBottom: '55px', display: 'flex', justifyContent: 'flex-end' }}>
                 <AppBarHeader title={participant?.displayName || 'Loading...'} showBackButton={true} />
                 {Object.keys(groupedMessages).map(date => (
                     <div key={date} style={{ marginBottom: '10px', fontSize: '12px' }}>
@@ -208,9 +215,7 @@ useEffect(() => {
                                         }}
                                     />
                                     </Link>
-                                    
                                 )}
-                                    
                                     <div style={{
                                         display: 'flex',
                                         flexDirection: 'column',
@@ -242,9 +247,9 @@ useEffect(() => {
                                         {formatTime(new Date(msg.timestamp.seconds * 1000))}
                                     </span>
                                     </div>
-                                    {msg.senderId === user?.uid && (
+                                    {/* {msg.senderId === user?.uid && (
                                         <div style={{ width: '40px', height: '40px' }} />
-                                    )}
+                                    )} */}
                                 </div>
                             ))}
                         </div>
@@ -253,13 +258,13 @@ useEffect(() => {
                 <div ref={messagesEndRef} />
             </div>
         <div className='textareabox_area'>
-            <form onSubmit={handleSubmit} className='textareabox'>
+            <form onSubmit={onSubmit} className='textareabox'>
                 <textarea
                     ref={textareaRef}
 
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={handleKeyDown}
+                    onKeyDown={onKeyDown}
                     placeholder="메시지 입력"
                     className='ChatTextarea'
                 />

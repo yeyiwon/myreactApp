@@ -38,5 +38,5 @@
       "contet/*"
     ]
   },
-  "extends": "expo/tsconfig.base"
+  
 }

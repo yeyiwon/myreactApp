@@ -14,10 +14,6 @@ import ThemeContext from "../../Context/ThemeContext";
 import { BiCamera } from "react-icons/bi";
 import { PostProps } from 'types/InterfaceTypes';
 
-import { formatDate } from '../Util/dateUtil';
-
-import ConfirmDialog from '../ConfirmDialog';
-
 export default function PostForm() {
     const [title, setTitle] = useState('');
     const [context, setContext] = useState('');
@@ -29,14 +25,6 @@ export default function PostForm() {
     const { theme } = useContext(ThemeContext);
     const [post, setPost] = useState<PostProps | null>(null);
 
-    
-    const [openLeaveDialog, setOpenLeaveDialog] = useState(false);
-
-    const handleOpenLeaveDialog = () => setOpenLeaveDialog(true);
-    const handleCloseLeaveDialog = () => setOpenLeaveDialog(false);
-    const handleLeavePage = () => {
-        navigate('/');
-    };
 
     useEffect(() => {
         if (params.id) {
@@ -63,7 +51,7 @@ export default function PostForm() {
                 console.error("데이터 없음!");
             }
         } catch (error) {
-            console.error("오류 발생:", error);
+            console.error(error);
         }
     };
 
@@ -123,6 +111,7 @@ export default function PostForm() {
                         createAt: post.createAt,
                         lastModifyAt: new Date().toISOString()
                     };
+
             await updateDoc(doc(db, 'Posts', post.id), updatePostData)
                 SuccessToast('게시글을 수정했습니다', theme);
                 navigate(`/Posts/${post.id}`);
@@ -170,8 +159,6 @@ export default function PostForm() {
     return (
         <div>
             <form onSubmit={onSubmit} className='formClassBox'>
-                
-                
                 <div className="ImageUploadPreview">
                     {imageFile || (post && post.imageUrl) ? (
                         <>

@@ -27,55 +27,43 @@ export default function AppBarHeader({ title, showBackButton=false } : AppBarHea
     const { user } = useContext(AuthContext);
     const context = useContext(ThemeContext);
     const { theme, toggleMode } = useContext(ThemeContext);
-    const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0);
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
     const navigate = useNavigate();
-    console.log('Unread messages count:', unreadMessagesCount); 
 
-useEffect(() => {
-        const fetchChatRooms = async () => {
-            if (user?.uid) {
-                const userDoc = doc(db, 'Users', user.uid);
+    // console.log('안 읽은 메세지 카운트', unreadMessagesCount); 
+    useEffect(() => {
+    if (!user?.uid) return;
 
-                const unsubscribeUser = onSnapshot(userDoc, async (userSnap) => {
-                    if (userSnap.exists()) {
-                        const userData = userSnap.data();
-                        const userChatRooms: string[] = userData.chatRooms || [];
-                        
-                        const chatRoomsCollection = collection(db, 'ChatRooms');
-                        
-                        const unsubscribeChatRooms = onSnapshot(chatRoomsCollection, async (chatRoomsSnapshot) => {
-                            const rooms = chatRoomsSnapshot.docs
-                                .filter(doc => userChatRooms.includes(doc.id))
-                                .map(async (doc) => {
-                                    const roomData = doc.data() as ChatRoomProps; // Use ChatRoomProps here
-                                    const unreadMessagesCount = roomData.unreadMessages?.[user.uid] || 0;
+    const userDocRef = doc(db, 'Users', user.uid);
 
-                                    return {
-                                        
-                                        ...roomData,
-                                        unreadMessagesCount
-                                    } as ChatRoomProps;
-                                });
+    const filterUser = onSnapshot(userDocRef, async (userSnap) => {
+        if (!userSnap.exists()) return;
 
-                            const resolvedRooms = await Promise.all(rooms);
-                            const totalUnreadCount = resolvedRooms.reduce((acc, room) => acc + (room.unreadMessagesCount || 0), 0);
-                            setUnreadMessagesCount(totalUnreadCount);
-                        });
+        const userData = userSnap.data();
+        const userChatRooms = userData.chatRooms || [];
 
-                        return () => {
-                            unsubscribeChatRooms();
-                        };
-                    }
-                });
+        if (userChatRooms.length === 0) return;
+        const chatRoomsRef = collection(db, 'ChatRooms');
 
-                return () => {
-                    unsubscribeUser();
-                };
-            }
-        };
+        const filterChatRoom = onSnapshot(chatRoomsRef, (roomsSnap) => {
+            const totalUnreadCount = roomsSnap.docs
+                .filter(room => userChatRooms.includes(room.id)) 
+                .reduce((total, room) => { // reduce 로 현재 값 filter 한 room 매개변수를 가지고
+                    const roomData = room.data() as ChatRoomProps; // 챗루ㅁ 인터페이ㅡㄹ를 참조하여 변수에 담고 
+                    // console.log(roomData)
+                    const unreadCount = roomData.unreadMessages?.[user.uid] || 0;
+                    // console.log(unreadCount)
 
-        fetchChatRooms();
-    }, [user?.uid]);
+                    return total + unreadCount; // 읽지 않은 메시지 수 더하기
+                }, 0); // 초기값 0 설정
+            // 총 읽지 않은 메시지 수 업데이트
+            setUnreadMessagesCount(totalUnreadCount);
+        });
+        return () => filterChatRoom();
+    });
+    return () => filterUser();
+}, [user?.uid]);
+
 
     const BackClick = () => {
         navigate(-1);

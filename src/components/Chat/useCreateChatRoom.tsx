@@ -9,7 +9,7 @@ export function useCreateChatRoom() {
     const navigate = useNavigate();
 
     // 채팅방 생성 함수
-    const handleCreateRoom = async (targetUserId: string) => {
+    const CreateRoom = async (targetUserId: string) => {
         if (!user?.uid) {
             console.error('사용자 정보가 없습니다.');
             return;
@@ -61,5 +61,5 @@ export function useCreateChatRoom() {
         }
     };
 
-    return { handleCreateRoom };
+    return { CreateRoom };
 }

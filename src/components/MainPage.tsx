@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Spline from '@splinetool/react-spline';
 
 export default function MainPage(){
     return(

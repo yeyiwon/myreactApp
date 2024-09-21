@@ -25,18 +25,6 @@ export default function PostList() {
         setTab(newValue);
     };
 
-    const ToggleLike = async (post: PostProps) => {
-        if (!post.id) return;
-        const postRef = doc(db, 'Posts', post.id);
-
-        const updateLikes = user?.uid && post?.likes?.includes(user?.uid)
-            ? { likes: arrayRemove(user?.uid), likeCount: post.likeCount ? post.likeCount - 1 : 0 }
-            : { likes: arrayUnion(user?.uid), likeCount: post.likeCount ? post.likeCount + 1 : 1 };
-
-        await updateDoc(postRef, updateLikes);
-        getPosts(); // 반영 바로 되도록
-    };
-
 const getPosts = async () => {
         setLoading(true);
         try {
@@ -99,15 +87,6 @@ const getPosts = async () => {
     useEffect(() => {
         getPosts();
     }, [tab]);
-
-
-
-    useEffect(() => {
-        getPosts();
-    }, [tab, ]);
-
-
-
 
     return (
         <div className='postContainer' style={{ paddingBottom: '64px' }}>

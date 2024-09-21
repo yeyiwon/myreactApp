@@ -10,6 +10,7 @@ import AuthContext from 'Context/AuthContext';
 import AppBottomNav from 'components/LayOut/BottomNavigation';
 import { useCreateChatRoom } from './Chat/useCreateChatRoom';
 
+
 export default function UserProfile() {
     const { theme } = useContext(ThemeContext);
     const { id } = useParams<{ id: string }>();
@@ -18,11 +19,11 @@ export default function UserProfile() {
     const [posts, setPosts] = useState<PostProps[]>([]);
     const [profileUser, setProfileUser] = useState<UserProps | null>(null);
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
-    const { handleCreateRoom } = useCreateChatRoom();
+    const { CreateRoom } = useCreateChatRoom();
 
-    const handleSendMessage = () => {
+    const SendMessage = () => {
         if (id) {
-            handleCreateRoom(id);
+            CreateRoom(id);
         }
     };
     // 프로필 유저의 데이터가 실시간으로 반영되도록 수정
@@ -31,7 +32,7 @@ export default function UserProfile() {
             const userRef = doc(db, 'Users', id);
 
             // 실시간으로 유저 데이터를 가져오기 위해 onSnapshot 사용
-            const unsubscribeUser = onSnapshot(userRef, (snapshot) => {
+            const filterUser = onSnapshot(userRef, (snapshot) => {
                 if (snapshot.exists()) {
                     setProfileUser(snapshot.data() as UserProps);
                 } else {
@@ -46,7 +47,7 @@ export default function UserProfile() {
                 orderBy('createAt', "desc")
             );
 
-            const unsubscribePosts = onSnapshot(postsQuery, (snapshot) => {
+            const filterPosts = onSnapshot(postsQuery, (snapshot) => {
                 const postsData = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
@@ -55,8 +56,8 @@ export default function UserProfile() {
             });
 
             return () => {
-                unsubscribeUser(); // 구독 해제
-                unsubscribePosts();
+                filterUser();
+                filterPosts();
             };
         }
     }, [id]);
@@ -71,7 +72,7 @@ export default function UserProfile() {
                 setIsFollowing(userData?.following?.includes(id));
             });
 
-            return () => unsubscribe(); // 구독 해제
+            return () => unsubscribe(); 
         }
     }, [user, id]);
 
@@ -154,14 +155,15 @@ export default function UserProfile() {
                             >
                                 {isFollowing ? 'Unfollow' : 'Follow'}
                             </button>
-                            <button className='Profile_msgBtn' onClick={handleSendMessage}>
+                            <button className='Profile_msgBtn' onClick={SendMessage}>
                                 메세지
                             </button>
                         </div>
                     </div>
                 </div>
+                
                 <div className="ProfileMypostContainer">
-                    <h3 className='ProfiePost_list_title'> Post </h3>
+                    <h3 className='ProfiePost_list_title' style={{ position: 'sticky', top: '56px', left: 0, zIndex: 10 }}> Post </h3>
                     <ul className='ProfiePost_list'>
                         {posts.length > 0 ? posts.map(post => (
                             <Link key={post.id} to={`/Posts/${post?.id}`}>

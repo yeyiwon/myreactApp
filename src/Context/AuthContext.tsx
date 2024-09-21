@@ -4,6 +4,8 @@ import { app } from "firebaseApp";
 
 interface AuthProps {
     children: ReactNode
+    // 모든 인터페이스를 받기 위해 
+    // AuthContextProvider 모든 타입의 자식을 받을 수 있도록 
 }
 
 const AuthContext = createContext({
@@ -33,6 +35,7 @@ export const AuthContextProvider = ({ children }: AuthProps ) => {
             }
         });
     }, [auth]);
+
 
     return <AuthContext.Provider value={{user: currentUser}}>
         {children}

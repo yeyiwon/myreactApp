@@ -12,7 +12,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { formatDate } from '../Util/dateUtil';
 import { CommentsInterface, PostProps } from 'types/InterfaceTypes';
 
-import ConfirmDialog from "../ConfirmDialog";
+import ConfirmDialog from "../Util/ConfirmDialog";
 
 interface CommentsProps{
     post: PostProps;
@@ -24,27 +24,20 @@ export default function Comment({post, getPost} : CommentsProps){
     const {user } = useContext(AuthContext);
     const {theme } = useContext(ThemeContext)
     const navigate = useNavigate();
-    const [selectedComment, setSelectedComment] = useState<CommentsInterface | null>(null);  // 삭제할 댓글 정보
+    const [selectedComment, setSelectedComment] = useState<CommentsInterface | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
-
-    // ConfirmDialog 열기/닫기
-    const handleClickOpen = (comment: CommentsInterface) => {
-        setSelectedComment(comment);  // 삭제할 댓글 저장
+    
+    const ClickOpen = (comment: CommentsInterface) => {
+        setSelectedComment(comment); 
         setOpenDialog(true); 
     };
-    const handleClose = () => setOpenDialog(false);
+    const Close = () => setOpenDialog(false);
     
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const {
-            target: {name, value}
-        } = e;
-
-        if(name === 'comment'){
-            setComment(value)
-        }
+        setComment(e.target.value);
     };
 
-const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (post && post.id && user?.uid) {
@@ -89,7 +82,7 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         }
     };
 
-const DeleteComment = async () => {
+    const DeleteComment = async () => {
         if (selectedComment && post?.id) {
             try {
                 const postRef = doc(db, 'Posts', post.id);
@@ -98,16 +91,13 @@ const DeleteComment = async () => {
                 });
                 SuccessToast('댓글을 삭제했습니다', theme);
                 await getPost(post.id);
-                handleClose();  // Dialog 닫기
+                Close();  // Dialog 닫기
             } catch (error) {
                 console.error('댓글 삭제 오류:', error);
                 ErrorToast('댓글 삭제 실패', theme);
             }
         }
     };
-
-
-
 
     return (
         <div className="Comment_Area">
@@ -170,7 +160,7 @@ const DeleteComment = async () => {
                                             top: '50%',
                                             transform: 'translateY(-50%)',
                                         }}
-                                        onClick={() => handleClickOpen(comment)}
+                                        onClick={() => ClickOpen(comment)}
                                     >
                                         <FaRegTrashAlt size={16} />
                                     </IconButton>
@@ -186,7 +176,7 @@ const DeleteComment = async () => {
                         open={openDialog}
                         content="댓글을 삭제하시겠습니까?"
                         onConfirm={DeleteComment}
-                        onCancel={handleClose}
+                        onCancel={Close}
                         />
         </div>
     );

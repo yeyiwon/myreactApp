@@ -14,7 +14,7 @@ import { MdFavoriteBorder } from "react-icons/md";
 import { MdFavorite } from "react-icons/md";
 import { formatDate } from '../Util/dateUtil';
 import LoadingScreen from '../Util/LoadingScreen';
-import ConfirmDialog from "../ConfirmDialog";
+import ConfirmDialog from "../Util/ConfirmDialog";
 
 import Comment from "./comment";
 
@@ -50,12 +50,12 @@ export default function PostDetail() {
             console.error('삭제 실패:', error);
             ErrorToast('삭제 실패', theme);
         }
-        setOpenDialog(false); // Close the dialog after deletion
+        setOpenDialog(false); 
     };
 
-  const handleCancelDelete = () => {
-    setOpenDialog(false);
-  };
+    const handleCancelDelete = () => {
+        setOpenDialog(false);
+    };
 
 
     const ToggleLike = async () => {
@@ -68,7 +68,7 @@ export default function PostDetail() {
 
         await updateDoc(postRef, updateLikes);
 
-        if (!post?.likes?.includes(user?.uid)) {
+                if (!post?.likes?.includes(user?.uid)) {
                     await addDoc(collection(db, 'Notification'), {
                         uid: id, // 알림을 받을 사용자 
                         isRead: false,
@@ -87,7 +87,7 @@ export default function PostDetail() {
     const getPost = useCallback(async (id: string) => {
         if (id) {
             try {
-                console.log('Fetching post with ID:', id);
+
                 const docRef = doc(db, 'Posts', id);
                 const docSnap = await getDoc(docRef);
                 
@@ -226,6 +226,11 @@ export default function PostDetail() {
                                 />
                                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 
+                                </div>
+
+                            </div>
+                        )}
+                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 <IconButton
                                     sx={{
                                         display: 'flex',
@@ -241,11 +246,7 @@ export default function PostDetail() {
                                     <span className='likeCount'>{post?.likeCount || 0}</span>
                                 </IconButton>
 
-                                </div>
-
                             </div>
-                        )}
-                        
                         <div className="PostDetailContext_text">
                             <h2 className="PostDetailtitle">{post.title}</h2>
                             <div className="PostDetailcontext">

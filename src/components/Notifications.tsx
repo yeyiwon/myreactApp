@@ -12,6 +12,7 @@ import { NotificationType, UserProps } from 'types/InterfaceTypes';
 
 export default function Notification() {
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
+    // 알림 리스트를 저장하는 상태 
     const { user } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const { theme } = useContext(ThemeContext);
@@ -27,11 +28,11 @@ export default function Notification() {
 
             const unsubscribe = onSnapshot(notificationQuery, async (snapshot) => {
                 const notificationsData: NotificationType[] = [];
+                // 노티 타입 지정해준 배열타입으로 배열로 받을 거라서 
 
                 for (const docSnapshot of snapshot.docs) {
                     const data = docSnapshot.data() as NotificationType;
 
-                    // Fetch author data
                     if (data.authorUid) {
                         try {
                             const authorDocRef = doc(db, 'Users', data.authorUid);
@@ -46,14 +47,13 @@ export default function Notification() {
                                 });
                             }
                         } catch (error) {
-                            console.error('Error fetching author document:', error);
+                            console.error(error);
                         }
                     }
                 }
                 setNotifications(notificationsData);
                 setLoading(false);
 
-                // Update all notifications to read
                 const unreadNotifications = snapshot.docs.filter(doc => !doc.data().isRead);
                 await Promise.all(unreadNotifications.map(async (docSnapshot) => {
                     const docRef = doc(db, 'Notification', docSnapshot.id);
@@ -62,6 +62,7 @@ export default function Notification() {
             });
 
             return () => unsubscribe();
+            // 얘가 필요한 이유는 onsnapshot으로 실시간으로 받는데 
         }
     }, [user]);
 

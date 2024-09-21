@@ -4,13 +4,11 @@ import AppBarHeader from '../LayOut/Header';
 import AppBottomNav from '../LayOut/BottomNavigation';
 import { Dialog, DialogActions, DialogContent, Button, Select, MenuItem, FormControl, Badge, Avatar } from '@mui/material';
 import { db } from 'firebaseApp';
-import { collection, doc, getDoc, getDocs, onSnapshot, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
 import AuthContext from 'Context/AuthContext';
 import { RiChatNewLine } from "react-icons/ri";
 import { UserProps, ChatRoomProps, Message } from 'types/InterfaceTypes';
 import { useCreateChatRoom } from './useCreateChatRoom';
-
-import { format, isToday, formatDistanceToNow } from 'date-fns';
 
 export default function ChatList() {
   const [open, setOpen] = useState(false);
@@ -19,7 +17,7 @@ export default function ChatList() {
   const [chatRooms, setChatRooms] = useState<ChatRoomProps[]>([]);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { handleCreateRoom } = useCreateChatRoom();
+  const { CreateRoom } = useCreateChatRoom();
   const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0); // 상태 추가
 
 
@@ -47,32 +45,82 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
   }
 };
 
-
-  // 채팅방의 상대방 정보
-  const getOtherUserInfo = async (room: ChatRoomProps): Promise<UserProps | null> => {
-    if (!user || !room.users) return null;
-    
-    const otherUserId = room.users.find((userId) => userId !== user.uid);
-    if (!otherUserId) return null;
-
-    const otherUserDocRef = doc(db, 'Users', otherUserId);
-    const otherUserSnapshot = await getDoc(otherUserDocRef);
-    if (otherUserSnapshot.exists()) {
-      const otherUserData = otherUserSnapshot.data();
-      return {
-        id: otherUserId,
-        ...otherUserData
-      } as UserProps;
-    }
-    return null;
-  };
-
-   // 팔로잉 리스트
-  const fetchFollowingList = async () => {
+// 채팅방 리스트 가져오는 함수 
+// 흐름 정리 : 채팅방 리스트를 가져올 땐 현재 로그인 된 사용자를 Users 라는 데이터베이스 컬렉션 안에서 골라온다 
+// 유저 정보를 userDoc 변수 안에 담아 놓고 onSnapshot을 하기 위해 async 한다 콜백 매개변수값으로 userSnap 
+  const getChatRooms = () => {
     if (user?.uid) {
       const userDoc = doc(db, 'Users', user.uid);
-      const userSnap = await getDoc(userDoc);
+      // 유저의 정보를 userDoc에 담아놓고 바뀔 때마다 호출
+      const filterUser = onSnapshot(userDoc, async (userSnap) => {
+        if (userSnap.exists()) {
+
+          const userData = userSnap.data();
+          const userChatRooms: string[] = userData.chatRooms || [];
+          const chatRoomsCollection = collection(db, 'ChatRooms');
+          
+          const filterChatRooms = onSnapshot(chatRoomsCollection, async (chatRoomsSnapshot) => {
+            const rooms = chatRoomsSnapshot.docs.filter(doc => userChatRooms.includes(doc.id))
+              .map(doc => {
+                const roomData = doc.data();
+                return {
+                  id: doc.id,
+                  ...roomData,
+                }as ChatRoomProps;
+              });
+
+            const resolvedRooms = await Promise.all(
+              rooms.map(async (room) => {
+                const otherUser = await getOtherUserInfo(room);
+                const lastMessage = room.lastMessage || '';
+                const unreadMessagesCount = room.unreadMessages?.[user.uid] || 0;
+                const lastMessageTimestamp = room.lastMessageTimestamp || { seconds: 0 };
+
+                return {
+                  ...room,
+                  otherUser,
+                  lastMessage,
+                  unreadMessagesCount,
+                  lastMessageTimestamp,
+                } as ChatRoomProps;
+              })
+            );
+
+            const sortedRooms = resolvedRooms.sort((a, b) => {
+              return (b.lastMessageTimestamp?.seconds || 0) - (a.lastMessageTimestamp?.seconds || 0);
+            });
+
+            setChatRooms(sortedRooms);
+          });
+
+              return () => {
+                filterChatRooms();
+              };
+            }
+          });
+          return () => {
+            filterUser(); // 작업 끝 ~
+          };
+        }
+      };
+
+  useEffect(() => {
+    getChatRooms(); 
+    getFollowingList();
+    
+  }, [user?.uid]);
+
+    // 실시간 데이터 업데이트: 사용자가 로그인할 때 새로운 데이터(예: 채팅방, 팔로우 리스트 등)를 가져와야 하니까. 현재 로그인되어있는 사용자 기준으로 실시간 업데이트가 되어야하기 때문에 user?.uid 가 되는 것임 
+
+    // 만약 사용자가 로그아웃하거나 다른 사용자로 로그인하면, 기존에 저장된 데이터는 더 이상 유효하지 않으므로 새로운 사용자에 맞는 데이터를 로드 
+
+   // 팔로잉 리스트
+  const getFollowingList = async () => {
+    if (user?.uid) {
+      const userSnap = await getDoc(doc(db, 'Users', user?.uid))
+
       if (userSnap.exists()) {
+        //있는지 확인하고, 
         const userData = userSnap.data();
         const followingIds: string[] = userData.following || [];
 
@@ -84,86 +132,30 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
               return { id, ...userDoc.data() } as UserProps;
             }
             return null;
+
           })
         );
-
-        setFollowingList(followingUsers.filter(user => user !== null) as UserProps[]);
+        // console.log(followingUsers)
+        setFollowingList(followingUsers as UserProps[]);
       }
     }
   };
 
-   // 채팅방의 메시지를 읽음으로 표시하는 함수
-  const markMessagesAsRead = async (roomId: string) => {
-    if (user?.uid) {
-      const chatRoomRef = doc(db, 'ChatRooms', roomId);
-      await updateDoc(chatRoomRef, {
-        [`unreadMessages.${user.uid}`]: 0
-      });
-    }
-  };
+const getOtherUserInfo = async (room: ChatRoomProps): Promise<UserProps | null> => {
+  if (!user || !room.users) return null;
 
-// 채팅방 리스트 가져오는 함수
-  const fetchChatRooms = () => {
-    if (user?.uid) {
-      const userDoc = doc(db, 'Users', user.uid);
+  const otherUserId = room.users.find(userId => userId !== user.uid);
+  // find 메서드는 배열에서 주어진 조건을 만족하는 첫 번째 요소를 찾는 함수. user.uid와 같지 않은 첫 번째 사용자 ID를 반환하기 위해 find 사용함 .
+  if (!otherUserId) return null;
 
-      // Firestore onSnapshot 리스너
-      const unsubscribeUser = onSnapshot(userDoc, async (userSnap) => {
-        if (userSnap.exists()) {
-          const userData = userSnap.data();
-          const userChatRooms: string[] = userData.chatRooms || [];
-          
-          const chatRoomsCollection = collection(db, 'ChatRooms');
-          
-          // Firestore onSnapshot 리스너
-          const unsubscribeChatRooms = onSnapshot(chatRoomsCollection, (chatRoomsSnapshot) => {
-            const rooms = chatRoomsSnapshot.docs
-              .filter(doc => userChatRooms.includes(doc.id))
-              .map(async (doc) => {
-                const roomData = doc.data() as Omit<ChatRoomProps, 'id'>;
-                const otherUser = await getOtherUserInfo({ id: doc.id, ...roomData });
-                const messageCount = roomData.Message?.length || 0;
-                const lastMessage = roomData.lastMessage || '';
-                const unreadMessagesCount = roomData.unreadMessages?.[user.uid] || 0;
-                const lastMessageTimestamp = roomData.lastMessageTimestamp || { seconds: 0 };
+  // find 로 찾아놓은 친구 Users 데이터 베이스에서 찾아오기
+  const otherUserDocRef = doc(db, 'Users', otherUserId);
+  const otherUserSnapshot = await getDoc(otherUserDocRef);
 
-                return {
-                  id: doc.id,
-                  ...roomData,
-                  otherUser,
-                  messageCount,
-                  lastMessage,
-                  unreadMessagesCount,
-                  lastMessageTimestamp
-                } as ChatRoomProps;
-              });
-            Promise.all(rooms).then((resolvedRooms) => {
-              const sortedRooms = resolvedRooms.sort((a, b) => {
-                return (b.lastMessageTimestamp?.seconds || 0) - (a.lastMessageTimestamp?.seconds || 0);
-              });
+  // 사용자 정보가 존재하면 반환
+  return otherUserSnapshot.exists() ? { id: otherUserId, ...otherUserSnapshot.data() } as UserProps : null;
+};
 
-              setChatRooms(sortedRooms as ChatRoomProps[]);
-              const totalUnreadCount = sortedRooms.reduce((acc, room) => acc + (room.unreadMessagesCount || 0), 0);
-              setUnreadMessagesCount(totalUnreadCount);
-            });
-          });
-
-          return () => {
-            unsubscribeChatRooms();
-          };
-        }
-      });
-
-      return () => {
-        unsubscribeUser();
-      };
-    }
-  };
-
-  useEffect(() => {
-    fetchChatRooms(); // 컴포넌트 마운트 시 채팅방 및 팔로잉 리스트 가져오기
-    fetchFollowingList();
-  }, [user?.uid]);
   const handleClose = () => {
     setOpen(false);
     setSelectedUserId(null);
@@ -171,7 +163,7 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
 
   const handleCreateNewChat = () => {
     if (selectedUserId) {
-      handleCreateRoom(selectedUserId);
+      CreateRoom(selectedUserId);
       handleClose();
     }
   };
