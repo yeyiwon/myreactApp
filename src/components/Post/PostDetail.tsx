@@ -16,26 +16,137 @@ import { formatDate } from '../Util/dateUtil';
 import LoadingScreen from '../Util/LoadingScreen';
 import ConfirmDialog from "../Util/ConfirmDialog";
 
-import Comment from "./comment";
-
 import ReactMarkDown from 'react-markdown'
-import { PostWithAuthor, CommentsInterface, PostProps } from "types/InterfaceTypes";
+import {CommentsInterface, PostProps } from "types/InterfaceTypes";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { TiArrowUp } from "react-icons/ti";
 
 export default function PostDetail() {
     const [openDialog, setOpenDialog] = useState(false);
-    const navigate = useNavigate();
-    const [post, setPost] = useState<PostWithAuthor | null>(null);
-    const { theme } = useContext(ThemeContext);
+    const [post, setPost] = useState<PostProps | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [comment, setComment] = useState<string>('');
     const { id } = useParams<{ id: string }>();
     const { user } = useContext(AuthContext);
+    const {theme } = useContext(ThemeContext)
+    const navigate = useNavigate();
+    const [selectedComment, setSelectedComment] = useState<CommentsInterface | null>(null);
+    
+    const getPost = async (postId: string) => {
+    if (!postId) return;
+    setLoading(true);
 
-    const handleDeleteClick = () => {
+    const PostDoc = await getDoc(doc(db, 'Posts', postId));
+    const postData = PostDoc.data() as PostProps;
+    if (!postData) return;
+
+    const authorDoc = await getDoc(doc(db, 'Users', postData.uid));
+    const authorData = authorDoc.data();
+
+    const commentsWithAuthor = await Promise.all(
+        // 
+        postData.comments?.map(async (comment) => {
+            const commentAuthorDoc = await getDoc(doc(db, 'Users', comment.uid));
+            const commentAuthorData = commentAuthorDoc.data();
+            return {
+                ...comment,
+                authorDisplayName: commentAuthorData?.displayName,
+                authorProfileUrl: commentAuthorData?.photoURL,
+            };
+        }) || []
+    );
+
+    setPost({
+        ...postData,
+        id: PostDoc.id,
+        authorDisplayName: authorData?.displayName,
+        authorProfileUrl: authorData?.photoURL,
+        comments: commentsWithAuthor,
+    });
+    setLoading(false);
+    };
+
+    useEffect(() => {
+    if (id) getPost(id);
+    }, [id, theme]);
+
+    // 댓글 관련 로직 
+    const ClickOpen = (comment: CommentsInterface) => {
+        setSelectedComment(comment); 
+        setOpenDialog(true); 
+    };
+    const Close = () => setOpenDialog(false);
+    
+    const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setComment(e.target.value);
+    };
+
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (post && post.id && user?.uid) {
+            try {
+                const postRef = doc(db, 'Posts', post.id);
+                const CommentsObj = {
+                    content: comment,
+                    uid: user.uid,
+                    email: user.email,
+                    url: `/Posts/${post?.id}`,
+                    createAt: new Date().toISOString(),
+                    authorDisplayName: user.displayName || '',
+                    authorProfileUrl: user.photoURL || '',
+                };
+
+                await updateDoc(postRef, {
+                    comments: arrayUnion(CommentsObj),
+                    // createAt: new Date().toISOString(),
+                });
+                    await getPost(post.id);
+
+
+                // 글 작성자와 댓글 작성자 확인
+                if (post.uid !== user?.uid) {
+                    // 글 작성자가 댓글 작성자와 다를 때만 알림 생성
+                    await addDoc(collection(db, 'Notification'), {
+                        uid: post.uid,
+                        isRead: false,
+                        createdAt: new Date().toISOString(),
+                        url: `/Posts/${post.id}`,
+                        content: '님이 댓글을 남겼습니다.',
+                        authorUid: user?.uid,
+                    });
+                }
+                SuccessToast('댓글을 작성했습니다.', theme);
+                setComment('');
+            } catch (error) {
+                console.log(error);
+                ErrorToast('댓글 생성 실패', theme);
+            }
+        }
+    };
+
+    const DeleteComment = async () => {
+        if (selectedComment && post?.id) {
+            try {
+                const postRef = doc(db, 'Posts', post.id);
+                await updateDoc(postRef, {
+                    comments: arrayRemove(selectedComment)
+                });
+                SuccessToast('댓글을 삭제했습니다', theme);
+                await getPost(post.id);
+                Close();  // Dialog 닫기
+            } catch (error) {
+                console.error('댓글 삭제 오류:', error);
+                ErrorToast('댓글 삭제 실패', theme);
+            }
+        }
+    };
+
+    const DeleteClick = () => {
     setOpenDialog(true);
     };
 
-    const handleConfirmDelete = async () => {
+    const ConfirmDelete = async () => {
         try {
             if (post?.imageUrl) {
                 const imageRef = ref(storage, post.imageUrl);
@@ -53,10 +164,11 @@ export default function PostDetail() {
         setOpenDialog(false); 
     };
 
-    const handleCancelDelete = () => {
+    const CancelDelete = () => {
         setOpenDialog(false);
     };
 
+    // 여까지 댓글 
 
     const ToggleLike = async () => {
         if (!post?.id || !user?.uid) return;
@@ -83,61 +195,6 @@ export default function PostDetail() {
 
         getPost(post.id); 
     };
-
-    const getPost = useCallback(async (id: string) => {
-        if (id) {
-            try {
-
-                const docRef = doc(db, 'Posts', id);
-                const docSnap = await getDoc(docRef);
-                
-                if (docSnap.exists()) {
-                    const postData = docSnap.data() as PostProps;
-
-                    // 작성자 정보 
-                    const authorRef = doc(db, 'Users', postData.uid);
-                    const authorSnap = await getDoc(authorRef);
-                    const authorData = authorSnap.data();
-
-                    // 댓글 작성자 정보 가져오기
-                    const commentsWithAuthor = await Promise.all(
-                        postData.comments?.map(async (comment) => {
-                            const commentAuthorRef = doc(db, 'Users', comment.uid);
-                            const commentAuthorSnap = await getDoc(commentAuthorRef);
-                            const commentAuthorData = commentAuthorSnap.data();
-
-                            return {
-                                ...comment,
-                                authorDisplayName: commentAuthorData?.displayName,
-                                authorProfileUrl: commentAuthorData?.photoURL,
-                            };
-                        }) || []
-                    );
-
-                    setPost({
-                        ...postData,
-                        id: docSnap.id,
-                        authorDisplayName: authorData?.displayName,
-                        authorProfileUrl: authorData?.photoURL,
-                        comments: commentsWithAuthor,
-                    });
-                } else {
-                    ErrorToast('게시글을 찾을 수 없습니다.', theme);
-                    navigate('/');
-                }
-            } catch (error) {
-                ErrorToast('게시글 로드 오류', theme);
-            } finally {
-                setLoading(false);
-            }
-        }
-    }, [navigate, theme]);
-
-    useEffect(() => {
-        if (id) getPost(id);
-    }, [id, getPost, theme]);  
-
-
     return (
         <>
         <AppBarHeader title={post?.authorDisplayName} showBackButton={true}/>
@@ -197,7 +254,7 @@ export default function PostDetail() {
                                         <Tooltip title="삭제">
                                             <IconButton
                                                 sx={{ color: theme === 'light' ? "#3D3A50" : "#F7F7F7" }}
-                                                onClick={handleDeleteClick}
+                                                onClick={DeleteClick}
                                             >
                                                 <MdDelete size={20} />
                                             </IconButton>
@@ -208,8 +265,8 @@ export default function PostDetail() {
                                         
 
                                             content="정말로 게시글을 삭제하시겠습니까?"
-                                            onConfirm={handleConfirmDelete}
-                                            onCancel={handleCancelDelete}
+                                            onConfirm={ConfirmDelete}
+                                            onCancel={CancelDelete}
                                         />
 
                                     </Box>
@@ -257,10 +314,85 @@ export default function PostDetail() {
                         </div>
                         
                         <div className="PostDetailComments">
-                            <Comment post={post as PostProps} getPost={getPost} />
-                            {post.comments && post.comments.length === 0 && (
-                                <p className="noPostlist">댓글이 없습니다.</p>
-                            )}
+                            <div className="Comment_Area">
+                                <h3> 댓글 {post?.comments?.length || 0}개 </h3>
+                                <div className="Comment_textArea">
+                                    <form className="Comment_text" onSubmit={onSubmit}>
+                                        <textarea
+                                            name="comment"
+                                            className="CommentArea"
+                                            onChange={onChange}
+                                            value={comment}
+                                            rows={2}
+                                            placeholder="댓글을 입력하세요"
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={!comment}
+                                            className="commentbutton"
+                                        >
+                                            <TiArrowUp color="#f7f7f7" size={35} />
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <ul className="Comment_Item">
+                                    {post?.comments?.map((comment, index) => (
+                                        <li key={index}>
+                                            <Link to={user?.uid === comment.uid ? `/Profile` : `/user/${comment.uid}`}
+                                                onClick={(e) => {
+                                                    if (user?.uid === comment.uid) {
+                                                        e.preventDefault();
+                                                        navigate(`/Profile`);
+                                                    }
+                                                }}
+                                            >
+                                                <Avatar
+                                                    src={comment?.authorProfileUrl}
+                                                    alt="profile"
+                                                    className="Comment_ProfileImage"
+                                                />
+                                            </Link>
+
+                                            <div className="Comment_Content">
+                                                <div className="Comment_Header">
+                                                    <span className="Comment_Author">{comment.authorDisplayName}</span>
+                                                    <span className="Comment_Time">
+                                                        {/* {comment.createAt} */}
+                                                        {formatDate(comment.createAt)}
+                                                    </span>
+                                                </div>
+                                                <span className="Comment_Text">{comment.content}</span>
+                                                
+                                                {comment.uid === user?.uid && (
+                                                    <Tooltip title='삭제'>
+                                                        <IconButton
+                                                            sx={{
+                                                                color: theme === 'light' ? '#1A1C22' : "#F7F7F7",
+                                                                position: 'absolute',
+                                                                right: 0,
+                                                                top: '50%',
+                                                                transform: 'translateY(-50%)',
+                                                            }}
+                                                            onClick={() => ClickOpen(comment)}
+                                                        >
+                                                            <FaRegTrashAlt size={16} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                    
+                                                )}
+
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                                        <ConfirmDialog
+                                            open={openDialog}
+                                            content="댓글을 삭제하시겠습니까?"
+                                            onConfirm={DeleteComment}
+                                            onCancel={Close}
+                                            />
+                            </div>
                         </div>
                     </>
                 ) : (

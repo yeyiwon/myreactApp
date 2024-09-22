@@ -5,16 +5,13 @@ import { collection, getDocs, doc, query, orderBy, arrayRemove, updateDoc, array
 import { db } from 'firebaseApp';
 import AuthContext from 'Context/AuthContext';
 import ThemeContext from '../../Context/ThemeContext';
-import { MdFavoriteBorder } from "react-icons/md";
-import { MdFavorite } from "react-icons/md";
 import Skeleton from '@mui/material/Skeleton';
-// import FollowingBox from './following/FollowingBox';
-import { PostProps, PostWithAuthor } from 'types/InterfaceTypes';
+
+import { PostProps } from 'types/InterfaceTypes';
 import { formatDate } from '../Util/dateUtil';
 
-
 export default function PostList() {
-    const [posts, setPosts] = useState<PostWithAuthor[]>([]);
+    const [posts, setPosts] = useState<PostProps[]>([]);
     const [loading, setLoading] = useState(true);
     const { user } = useContext(AuthContext);
     const { theme } = useContext(ThemeContext);
@@ -25,68 +22,62 @@ export default function PostList() {
         setTab(newValue);
     };
 
-const getPosts = async () => {
-        setLoading(true);
-        try {
-            const following = user ? await getUserFollowing(user.uid) : [];
-            const postsRef = collection(db, "Posts");
-            const postsQuery = query(postsRef, orderBy('createAt', "desc"));
-            const querySnapshot = await getDocs(postsQuery);
-
-            const fetchedPosts: PostWithAuthor[] = [];
-            const authorCache: { [key: string]: any } = {};
-
-            for (const docSnap of querySnapshot.docs) {
-                const postData = docSnap.data() as PostProps;
-                const authorId = postData?.uid;
-
-                if (!authorCache[authorId]) {
-                    const authorRef = doc(db, 'Users', authorId);
-                    const authorSnap = await getDoc(authorRef);
-                    authorCache[authorId] = authorSnap.data();
-                }
-
-                const authorData = authorCache[authorId];
-
-                if (tab === 'following' && (user?.uid === authorId || following.includes(authorId))) {
-                    fetchedPosts.push({
-                        ...postData,
-                        id: docSnap.id,
-                        authorDisplayName: authorData?.displayName,
-                        authorProfileUrl: authorData?.photoURL,
-                    });
-                } else if (tab === 'all') {
-                    fetchedPosts.push({
-                        ...postData,
-                        id: docSnap.id,
-                        authorDisplayName: authorData?.displayName,
-                        authorProfileUrl: authorData?.photoURL,
-                    });
-                }
-            }
-
-            setPosts(fetchedPosts);
-        } catch (error) {
-            console.error("포스트 오류:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const getUserFollowing = async (uid: string) => {
-        try {
-            const userRef = doc(db, 'Users', uid);
+    const getUserFollowing = async () => {
+        if(user){
+            // 현재 로그인 한 사용자가 있을 때만 팔로잉 목록 가져오기 
+            const userRef = doc(db, 'Users', user?.uid);
             const userSnap = await getDoc(userRef);
             return userSnap.data()?.following || [];
-        } catch (error) {
-            console.error("팔로잉 목록 오류:", error);
-            return [];
         }
     };
 
     useEffect(() => {
         getPosts();
     }, [tab]);
+
+    const getPosts = async () => {
+    setLoading(true);
+    if (user) { 
+        const following = await getUserFollowing();
+        const postsRef = collection(db, "Posts");
+        // 포스트 목록 가져오고 
+        const postsQuery = query(postsRef, orderBy('createAt', "desc"));
+        const querySnapshot = await getDocs(postsQuery);
+        const getPosts: PostProps[] = [];
+
+        for (const postList of querySnapshot.docs) {
+            const postData = postList.data() as PostProps;
+            // console.log(postData) // console.log(querySnapshot) 여기서 뜨는 엄청난 정보들 docSnap.data() as PostProps 타입 변환해서 받아옴
+            const authorId = postData?.uid;
+            // console.log(authorId) // 작성자의 아이디
+            const authorRef = doc(db, 'Users', authorId);
+            const authorSnap = await getDoc(authorRef);
+            const authorData = authorSnap.data();
+            // 만약에 ~~ user.uid === authorId: 현재 사용자가 작성자와 같은 경우 = 내가쓴 글이거나 following.includes(authorId)) 내 팔로잉 리스트에서 작성자의 아이디가 있는 경우라면은 팔로잉 탭에서 보이게 하고 그게 아니면 그냥 전체 탭에서 전체 다출력 해 
+            if (tab === 'following' && (user.uid === authorId || following.includes(authorId))) {
+                getPosts.push({
+                    ...postData,
+                    id: postList.id,
+                    authorDisplayName: authorData?.displayName,
+                    authorProfileUrl: authorData?.photoURL,
+                });
+            } else if (tab === 'all') {
+                getPosts.push({
+                    ...postData,
+                    id: postList.id,
+                    authorDisplayName: authorData?.displayName,
+                    authorProfileUrl: authorData?.photoURL,
+                });
+            }
+        }
+
+        setPosts(getPosts);
+    } else {
+        console.error("포스트 못가져옴");
+    }
+    setLoading(false);  
+};
+
 
     return (
         <div className='postContainer' style={{ paddingBottom: '64px' }}>

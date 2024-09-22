@@ -25,7 +25,7 @@ export default function MyFollowingList() {
     useEffect(() => {
         if (!user) return;
 
-        const fetchUserDetails = async (userIds: string[]) => {
+        const getUserInfo = async (userIds: string[]) => {
             const userDetails: FollowInfo[] = [];
             for (const userId of userIds) {
                 const userDoc = await getDoc(doc(db, 'Users', userId));
@@ -42,15 +42,15 @@ export default function MyFollowingList() {
             return userDetails;
         };
 
-        const fetchFollowData = async () => {
+        const getFollowData = async () => {
             try {
                 const userDoc = await getDoc(doc(db, 'Users', user.uid));
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
                     const followingList = userData.following || [];
                     const followersList = userData.followers || [];
-                    const followingDetails = await fetchUserDetails(followingList);
-                    const followersDetails = await fetchUserDetails(followersList);
+                    const followingDetails = await getUserInfo(followingList);
+                    const followersDetails = await getUserInfo(followersList);
 
                     setFollowing(followingDetails);
                     setFollowers(followersDetails);
@@ -62,7 +62,7 @@ export default function MyFollowingList() {
             }
         };
 
-        fetchFollowData();
+        getFollowData();
     }, [user]);
 
     const TabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -72,7 +72,7 @@ export default function MyFollowingList() {
     };
 
     // 팔로잉 삭제: 나의 팔로잉 목록과 상대방의 팔로워 목록에서 제거
-    const handleUnfollow = async (userId: string) => {
+    const Unfollow = async (userId: string) => {
         if (!user) return;
 
         const userRef = doc(db, 'Users', user.uid);
@@ -93,7 +93,7 @@ export default function MyFollowingList() {
     
 
     // 팔로워 삭제: 상대방의 팔로워 목록과 나의 팔로워 목록에서 제거
-    const handleRemoveFollower = async (followerId: string) => {
+    const RemoveFollower = async (followerId: string) => {
         if (!user) return;
 
         const myRef = doc(db, 'Users', user.uid); // 나의 정보
@@ -208,7 +208,7 @@ export default function MyFollowingList() {
                                             </button>
                                             <button
                                             className='PostList_following'
-                                                onClick={() => handleRemoveFollower(follower.id)}
+                                                onClick={() => RemoveFollower(follower.id)}
                                             >
                                                 팔로워 삭제
                                             </button>
@@ -236,7 +236,7 @@ export default function MyFollowingList() {
                                                         sx={{ width: '50px', height: '50px' }}
                                                     />
                                                 
-                                                                                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                         <span className='followname'>{followingUser.displayName}</span >
                                                         <span className='followemail'>{followingUser.email}</span>
                                                     </div>
@@ -252,7 +252,7 @@ export default function MyFollowingList() {
                                             </button>
                                             <button
                                                 className='PostList_following'
-                                                onClick={() => handleUnfollow(followingUser.id)}
+                                                onClick={() => Unfollow(followingUser.id)}
                                             >
                                                 언팔로우
                                             </button>

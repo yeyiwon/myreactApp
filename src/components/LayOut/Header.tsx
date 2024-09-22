@@ -124,7 +124,7 @@ export default function AppBarHeader({ title, showBackButton=false } : AppBarHea
                     
                     {context.theme === 'light' ? 
                     <BiSun onClick={context.toggleMode} className='thememodeBtn' size={25} color="#424242"/> : 
-                    <BiMoon onClick={context.toggleMode} className='thememodeBtn' size={28} color="#F7F7F7"/> }
+                    <BiMoon onClick={context.toggleMode} className='thememodeBtn' size={25} color="#F7F7F7"/> }
                     
     
                     <Link to={'/chatlist'}>

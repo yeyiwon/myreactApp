@@ -15,28 +15,58 @@ export default function Search() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // searchText 의 변화가 이을 때마다 
         if (searchText.trim() === "") {
             setResults([]);
             return;
         }
 
-        const usersRef = collection(db, "Users");
-        const q = query(
-            usersRef,
+        const usersSearch = collection(db, "Users");
+        
+        const emailQuery = query(
+            usersSearch,
+            //email 가 searchText가 시작하는 값 toLowerCase() 대소문자구문 x
             where("email", ">=", searchText.toLowerCase()),
             where("email", "<=", searchText.toLowerCase() + "\uf8ff")
         );
 
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const users: UserProps[] = [];
-            querySnapshot.forEach((doc) => {
-                const data = doc.data() as UserProps;
-                users.push({ ...data, id: doc.id });
+        const displayNameQuery = query(
+            usersSearch,
+            where("displayName", ">=", searchText.toLowerCase()),
+            where("displayName", "<=", searchText.toLowerCase() + "\uf8ff")
+        );
+
+        // 사용자 검색 결과를 저장할 배열 배열로 받는 건 내가 이름과 이메일 둘다 검색 가능하게 해두어서 그럼 
+        const allUsers: UserProps[] = [];
+        // 빈 배열 만들어 두는 건 그냥 코딩의 기본이니 외우자 useState 초기값 설정하는거랑 같은 의미
+
+        const filterEmail = onSnapshot(emailQuery, (emailSnapshot) => {
+            // 실시간으로 emailQuery 변경값을 가지면서 emailSnapshot 에 담고
+            // console.log(emailSnapshot.docs) // 엄청나게 많은 게 출력됨 얘를 타입 지정해서 가져올 필요가 있다
+            // 담긴 값으로 반복문을 도는 것임 
+            emailSnapshot.forEach((UserDoc) => {
+                const data = UserDoc.data() as UserProps;
+                allUsers.push({ ...data, id: UserDoc.id });
             });
-            setResults(users);
+            setResults(allUsers);
+            // 검색 결과 보여주기
         });
 
-        return () => unsubscribe();
+        const filterDisplayName = onSnapshot(displayNameQuery, (diplayNameSnapshot) => {
+            diplayNameSnapshot.forEach((UserDoc) => {
+                const data = UserDoc.data() as UserProps;
+                
+                if (!allUsers.find(user => user.id === UserDoc.id)) { 
+                    allUsers.push({ ...data, id: UserDoc.id });
+                }
+            });
+            setResults(allUsers);
+        });
+
+        return () => {
+            filterEmail();
+            filterDisplayName();
+        };
     }, [searchText]);
 
     return (

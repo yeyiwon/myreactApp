@@ -26,25 +26,18 @@ export interface PostProps {
     comments?: CommentsInterface[]; 
     lastModifyAt: string;
     backgroundColor?: string;
-}
-
-export interface PostWithAuthor extends PostProps {
     authorDisplayName?: string;
-    authorProfileUrl?: string;
+    authorProfileUrl?: string;  
 }
 
-export interface Message {
-  id: string;
-  text: string;
-  senderId: string;
-  senderProfilePic: string;
-  senderName: string;
-  lastMessage: string,
-  isRead: boolean;
-  isCurrentUser?: boolean; 
-  timestamp: { seconds: number };
-  lastMessageTimestamp?: { seconds: number };
 
+export interface CommentsInterface {
+    content: string;
+    uid: string;
+    email: string;
+    createAt: string;
+    authorDisplayName: string;
+    authorProfileUrl: string;
 }
 
 export interface ChatRoomProps {
@@ -59,7 +52,19 @@ export interface ChatRoomProps {
   unreadMessagesCount?: number;
   lastMessageTimestamp?: { seconds: number };
 }
+export interface Message {
+  id: string;
+  text: string;
+  senderId: string;
+  senderProfilePic: string;
+  senderName: string;
+  lastMessage: string,
+  isRead: boolean;
+  isCurrentUser?: boolean; 
+  timestamp: { seconds: number };
+  lastMessageTimestamp?: { seconds: number };
 
+}
 
 export interface NotificationType {
     id: string;
@@ -73,15 +78,6 @@ export interface NotificationType {
     authorProfileUrl?: string; 
 }
 
-
-export interface CommentsInterface {
-    content: string;
-    uid: string;
-    email: string;
-    createAt: string;
-    authorDisplayName: string;
-    authorProfileUrl: string;
-}
 
 export interface FollowInfo {
     id: string;           

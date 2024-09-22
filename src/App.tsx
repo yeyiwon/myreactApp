@@ -57,7 +57,7 @@ function App() {
             
             <ToastContainer stacked />
             <Box>
-                <Box>
+                <Box sx={{ maxWidth: '1000px', margin: '0 auto' }}>
 
                 <LoadingScreen isLoading={!init} />
                 {init ? <Router isAuthenticated={isAuthenticated} /> : null}

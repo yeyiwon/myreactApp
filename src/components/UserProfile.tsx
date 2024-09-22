@@ -67,12 +67,12 @@ export default function UserProfile() {
         if (user?.uid && id) {
             const userDocRef = doc(db, 'Users', user.uid);
 
-            const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
+            const CheckFollowing = onSnapshot(userDocRef, (snapshot) => {
                 const userData = snapshot.data();
                 setIsFollowing(userData?.following?.includes(id));
             });
 
-            return () => unsubscribe(); 
+            return () => CheckFollowing(); 
         }
     }, [user, id]);
 

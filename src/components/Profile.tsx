@@ -11,7 +11,6 @@ import { PostProps } from 'types/InterfaceTypes';
 import AppBottomNav from 'components/LayOut/BottomNavigation';
 import { collection, doc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import ConfirmDialog from './Util/ConfirmDialog';
-import { LuSmilePlus } from "react-icons/lu";
 
 export default function ProfilePage() {
     const { theme } = useContext(ThemeContext);
@@ -34,7 +33,7 @@ export default function ProfilePage() {
                 orderBy('createAt', "desc")
             );
 
-            const unsubscribePosts = onSnapshot(postsQuery, (snapshot) => {
+            const getPost = onSnapshot(postsQuery, (snapshot) => {
                 const postsData = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
@@ -42,10 +41,9 @@ export default function ProfilePage() {
                 setPosts(postsData);
             });
 
-            // 팔로잉 목록 가져오기
             const userRef = doc(db, 'Users', user.uid);
-            const unsubscribeUser = onSnapshot(userRef, (docSnap) => {
-                const userData = docSnap.data();
+            const getUserFollowingList = onSnapshot(userRef, (followSnap) => {
+                const userData = followSnap.data();
                 if (userData) {
                     setFollowingCount(userData.following?.length || 0);
                     setFollowersCount(userData.followers?.length || 0);
@@ -53,16 +51,16 @@ export default function ProfilePage() {
             });
 
             return () => {
-                unsubscribePosts();
-                unsubscribeUser();
+                getPost();
+                getUserFollowingList();
             };
         }
     }, [user]);
 
-    const handleClickOpen = () => setOpenLogoutDialog(true);
-    const handleClose = () => setOpenLogoutDialog(false);
+    const ClickOpen = () => setOpenLogoutDialog(true);
+    const Close = () => setOpenLogoutDialog(false);
 
-    const handleLogout = async () => {
+    const Logout = async () => {
         try {
             await signOut(getAuth(app)); // 로그아웃 처리
             SuccessToast('로그아웃 완료', theme);
@@ -70,11 +68,7 @@ export default function ProfilePage() {
         } catch (error) {
             ErrorToast('로그아웃 중 오류 발생', theme);
         }
-        handleClose();
-    };
-
-    const TabClick = (tab: string) => {
-        navigate(`/myFollowingList/?tab=${tab}`);
+        Close();
     };
 
     return (
@@ -88,7 +82,7 @@ export default function ProfilePage() {
                                 fontWeight: 'bold', 
                                 padding: 0 
                             }}
-                            onClick={handleClickOpen}  // 모달 열기
+                            onClick={ClickOpen}  // 모달 열기
                             >
                             <BiDoorOpen size={30} />
                             </IconButton>
@@ -97,8 +91,8 @@ export default function ProfilePage() {
                         <ConfirmDialog
                         open={openLogoutDialog}
                         content="로그아웃 하시겠습니까?"
-                        onConfirm={handleLogout}
-                        onCancel={handleClose}
+                        onConfirm={Logout}
+                        onCancel={Close}
                         />
                 </div>
                 <Avatar
@@ -113,13 +107,13 @@ export default function ProfilePage() {
                 <div className='posting_followerBox'>
                     <span className='PostLength'>게시물 {posts.length}</span>
                     <div className='follower_links_btn'
-                        onClick={() => TabClick('followers')}
+                        onClick={() => navigate(`/myFollowingList?tab=followers`)}
                     >
                         팔로워 {followersCount}
                     </div>
 
                     <div className='follower_links_btn'
-                        onClick={() => TabClick('following')}
+                        onClick={() => navigate(`/myFollowingList?tab=following`)}
                     >
                         팔로잉 {followingCount}
                     </div>

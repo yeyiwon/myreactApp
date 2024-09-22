@@ -8,11 +8,13 @@ import Badge from '@mui/material/Badge';
 
 import { BiHome, BiSearch, BiPlusCircle, BiBell } from "react-icons/bi";
 import { RiSignpostLine } from "react-icons/ri";
-
+import { LuSmilePlus } from "react-icons/lu";
 import AuthContext from 'Context/AuthContext';
 import ThemeContext from '../../Context/ThemeContext';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from 'firebaseApp';
+
+//노티피케이션 쿼리를 가져와서 그 안에서 실시간으로 감지 할건데 안 읽은 메세지만 필터링할 때 현재 유저가 받은 알림 에서 안 읽은 거만 필터링해서 useState의 값으로 보내서 ui에 띄워라
 
 export default function AppBottomNav() {
     const { user } = useContext(AuthContext);
@@ -22,22 +24,24 @@ export default function AppBottomNav() {
     const iconColor = theme === 'light' ? '#212121' : '#F7F7F7';
     const activeIconColor = theme === 'light' ? '#580Ef6' : '#580Ef6';
 
-    useEffect(() => {
-        if (user) {
-            const notificationsRef = collection(db, 'Notification');
-            const notificationQuery = query(
-                notificationsRef,
-                where('uid', '==', user.uid),
-                where('isRead', '==', false)
-            );
+useEffect(() => {
+    if (user) {
+        const notificationsRef = collection(db, 'Notification');
+        const notificationQuery = query(
+            notificationsRef,
+            where('uid', '==', user.uid)
+            //  현재 로그인한 유저가 받은 알림들만 찾아와 
+        );
 
-            const unsubscribe = onSnapshot(notificationQuery, (snapshot) => {
-                setUnreadCount(snapshot.size);
-            });
+        const filterNotification = onSnapshot(notificationQuery, (snapshot) => {
+            const unreadNotifications = snapshot.docs.filter(doc => !doc.data().isRead);
+            // notificationQuery 위에서 쿼리로 현재 로그인한 유저가 받은 알림만 골라낸 거에서 안 읽은 거만 골라내라 
+            setUnreadCount(unreadNotifications.length);
+        });
 
-            return () => unsubscribe();
-        }
-    }, [user]);
+        return () => filterNotification();
+    }
+}, [user]);
 
     return (
         <Box sx={{ 
@@ -72,7 +76,7 @@ export default function AppBottomNav() {
                 <BottomNavigationAction
                     component={Link}
                     to="/Posts/new"
-                    icon={<BiPlusCircle size={30} />}
+                    icon={<LuSmilePlus size={30} />}
                     sx={{
                         color: location.pathname === '/Posts/new' ? activeIconColor : iconColor,
                     }}

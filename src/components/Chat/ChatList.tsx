@@ -45,6 +45,8 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
   }
 };
 
+
+
 // 채팅방 리스트 가져오는 함수 
 // 흐름 정리 : 채팅방 리스트를 가져올 땐 현재 로그인 된 사용자를 Users 라는 데이터베이스 컬렉션 안에서 골라온다 
 // 유저 정보를 userDoc 변수 안에 담아 놓고 onSnapshot을 하기 위해 async 한다 콜백 매개변수값으로 userSnap 
@@ -156,15 +158,15 @@ const getOtherUserInfo = async (room: ChatRoomProps): Promise<UserProps | null> 
   return otherUserSnapshot.exists() ? { id: otherUserId, ...otherUserSnapshot.data() } as UserProps : null;
 };
 
-  const handleClose = () => {
+  const CloseDialog = () => {
     setOpen(false);
     setSelectedUserId(null);
   };
 
-  const handleCreateNewChat = () => {
+  const CreateNewChat = () => {
     if (selectedUserId) {
       CreateRoom(selectedUserId);
-      handleClose();
+      CloseDialog();
     }
   };
 
@@ -225,7 +227,7 @@ const getOtherUserInfo = async (room: ChatRoomProps): Promise<UserProps | null> 
 
         <AppBottomNav />
 
-        <Dialog open={open} onClose={handleClose}
+        <Dialog open={open} onClose={CloseDialog}
           PaperProps={{
             style: {
               width: '280px',
@@ -265,13 +267,13 @@ const getOtherUserInfo = async (room: ChatRoomProps): Promise<UserProps | null> 
             </FormControl>
           </DialogContent>
           <DialogActions sx={{ display: 'flex', justifyContent: 'center', gap: '2px' }}>
-            <Button fullWidth onClick={handleClose} sx={{
+            <Button fullWidth onClick={CloseDialog} sx={{
               color: '#333',
               height: '40px',
               backgroundColor: '#efefef',
               
             }}>취소</Button>
-            <Button fullWidth onClick={handleCreateNewChat} sx={{
+            <Button fullWidth onClick={CreateNewChat} sx={{
               color: '#fff',
               height: '40px',
               backgroundColor: '#580Ef6',

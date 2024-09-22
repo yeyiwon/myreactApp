@@ -21,49 +21,43 @@ export default function PostForm() {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const params = useParams();
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const { theme } = useContext(ThemeContext);
     const [post, setPost] = useState<PostProps | null>(null);
 
 
-    useEffect(() => {
-        if (params.id) {
-            getPost(params.id);
-        }
-    }, [params.id]);
-
-    useEffect(() => {
-        if (post) {
-            setTitle(post.title);
-            setContext(post.context);
-            setImageFile(null);
-        }
-    }, [post]);
-
-    const getPost = async (id: string) => {
-        try {
-            const docRef = doc(db, 'Posts', id);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                const postData = docSnap.data() as PostProps;
-                setPost({ ...postData, id: docSnap.id });
-            } else {
-                console.error("데이터 없음!");
-            }
-        } catch (error) {
-            console.error(error);
+    const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        if (name === "title") {
+            setTitle(value);
+        } else if (name === "context") {
+            setContext(value);
         }
     };
 
+    // 이미지 올리기 
+    const uploadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file);
+        }
+    };
+    // 이미지 스토리지에 저장을 위해 `${user?.uid}/${uuidv4()}`; 스토리지 저장 경로/고유 id 값으로 저장
     const uploadImage = async (file: File) => {
-        const key = `${user?.uid}/${uuidv4()}`;
-        const storageRef = ref(storage, key);
-        const snapshot = await uploadBytes(storageRef, file);
-        return await getDownloadURL(snapshot.ref);
-    };
+    // uploadImage를 async로 처리하기 위해 file: File 인자로 받음
+    const key = `${user?.uid}/${uuidv4()}`;
+    // key에 스토리지에 저장할 고유의 값을 만들어줌
+    const storageRef = ref(storage, key);
+    // storageRef를 사용해 uploadBytes로 파일을 스토리지에 업로드
+    const snapshot = await uploadBytes(storageRef, file);
+    // uploadBytes: 스토리지에 파일을 업로드하고 업로드 상태를 반환
+    // getDownloadURL: 업로드한 파일의 URL을 반환
+    return await getDownloadURL(snapshot.ref); // 업로드한 파일의 다운로드 URL을 반환
+};
 
     const deleteImage = async (url: string) => {
+        // 사진을 바꾸거나 삭제할 때 스토리지에서도 삭제 
         const imageRef = ref(storage, url.split('?')[0]);
+        // url.split('?')[0]); 가 url 만 받을수 있는 역할 
         await deleteObject(imageRef);
     };
 
@@ -75,78 +69,40 @@ export default function PostForm() {
     };
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsSubmitting(true);
+    e.preventDefault();
 
-        try {
-            let imageUrl = post?.imageUrl || "";
+    let imageUrl = post?.imageUrl || "";
 
-            if (imageFile) {
-                if (post?.imageUrl) {
-                    await deleteImage(post.imageUrl);
-                }
+    if (imageFile) {
+        if (post?.imageUrl) await deleteImage(post.imageUrl);
+        imageUrl = await uploadImage(imageFile); 
+        // 수정할때 
+    }
 
-                imageUrl = await uploadImage(imageFile);
-            } else if (!post?.imageUrl) {
-                imageUrl = ""; 
-            } else {
-                imageUrl = post.imageUrl; 
-            }
-
-            const postData = {
-                title,
-                context,
-                imageUrl,
-                createAt: new Date().toISOString(),
-                uid: user?.uid || '',
-                displayName: user?.displayName || '',
-                profileUrl: user?.photoURL || '',
-                email: user?.email || '',
-                backgroundColor: getRandomColor()
-            };
-
-            if (post && post.id) {
-                    const updatePostData = {
-                        ...postData,
-                        createAt: post.createAt,
-                        lastModifyAt: new Date().toISOString()
-                    };
-
-            await updateDoc(doc(db, 'Posts', post.id), updatePostData)
-                SuccessToast('게시글을 수정했습니다', theme);
-                navigate(`/Posts/${post.id}`);
-            } else {
-                await addDoc(collection(db, "Posts"), postData);
-                SuccessToast('업로드 완료', theme);
-                navigate('/');
-            }
-        } catch (error) {
-            console.error("오류 발생:", error);
-            ErrorToast('업로드 실패', theme);
-        } finally {
-            setIsSubmitting(false);
-            setTitle("");
-            setContext("");
-            setImageFile(null);
-        }
+    const postData = {
+        title,
+        context,
+        imageUrl,
+        createAt: post?.createAt || new Date().toISOString(), 
+        lastModifyAt: new Date().toISOString(), 
+        uid: user?.uid || '',
+        displayName: user?.displayName || '',
+        profileUrl: user?.photoURL || '',
+        email: user?.email || '',
+        backgroundColor: getRandomColor()
     };
 
-    const uploadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setImageFile(file);
-        }
-    };
+    if (post && post.id) {
+        await updateDoc(doc(db, 'Posts', post.id), postData);
+        SuccessToast('게시글을 수정했습니다', theme);
+        navigate(`/Posts/${post.id}`);
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        if (name === "title") {
-            setTitle(value);
-        } else if (name === "context") {
-            setContext(value);
-        }
-    };
-
+    } else {
+        await addDoc(collection(db, "Posts"), postData); 
+        SuccessToast('업로드 완료', theme);
+        navigate('/');
+    }
+};
     const getRandomColor = () => {
         const colors = [
             "#3D3A50", "#580ef6", "#1A1c22", "#f7f7f7",
@@ -155,6 +111,29 @@ export default function PostForm() {
         ];
         return colors[Math.floor(Math.random() * colors.length)];
     };
+
+    // 수정할 떄용 useEffect(() => {},[psrams.id])
+    useEffect(() => {
+    const getPost = async () => {
+        if (params.id) {
+            const docRef = doc(db, 'Posts', params.id);
+                console.log(docRef)
+                // if (params.id) 있을 때만
+                const postDoc = await getDoc(docRef);
+
+                if (postDoc.exists()) {
+                    const postData = postDoc.data() as PostProps;
+                    setPost({ ...postData, id: postDoc.id });
+                    setTitle(postData.title);
+                    setContext(postData.context);
+                    setImageFile(null);
+                } else {
+                    console.error("데이터 없음!");
+                }
+            }
+        };
+    getPost();
+}, [params.id]);
 
     return (
         <div>
@@ -242,7 +221,6 @@ export default function PostForm() {
                     type="submit"
                     sx={{ height: '50px' }}
                     fullWidth
-                    disabled={isSubmitting}
                 >
                     {post?.id ? '수정하기' : '업로드'}
                 </Button>

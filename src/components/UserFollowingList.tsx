@@ -17,69 +17,37 @@ export default function UserFollowingList() {
     const [userInfo, setUserInfo] = useState<UserProps | null>(null);
     const navigate = useNavigate();
 
-    const fetchFollowers = async () => {
-        if (userInfo?.followers) {
-            try {
-                const followersPromises = userInfo.followers.map(async (followerId) => {
-                    const followerDoc = await getDoc(doc(db, 'Users', followerId));
-                    return followerDoc.exists() ? (followerDoc.data() as FollowInfo) : null;
-                });
-                const followersData = await Promise.all(followersPromises);
-                setFollowers(followersData.filter(Boolean) as FollowInfo[]);
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    };
-
-    const fetchFollowing = async () => {
-        if (userInfo?.following) {
-            try {
-                const followingPromises = userInfo.following.map(async (followingId) => {
-                    const followingDoc = await getDoc(doc(db, 'Users', followingId));
-                    return followingDoc.exists() ? (followingDoc.data() as FollowInfo) : null;
-                });
-                const followingData = await Promise.all(followingPromises);
-                setFollowing(followingData.filter(Boolean) as FollowInfo[]);
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    };
-
     useEffect(() => {
-        if (id) {
-            const userRef = doc(db, 'Users', id);
-            const fetchUserInfo = async () => {
-                try {
-                    const userDoc = await getDoc(userRef);
-                    if (userDoc.exists()) {
-                        setUserInfo(userDoc.data() as UserProps);
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            };
+    if (id) {
+        const userRef = doc(db, 'Users', id);
 
-            fetchUserInfo(); 
+        const getUserSnap = onSnapshot(userRef, async (user) => {
+            if (user.exists()) {
+                setUserInfo(user.data() as UserProps);
+                
+                const followersData = await getUsersData(user.data().followers || []);
+                // getUsersData 안에서 followers 배열을 받는데 비어있을 수도 있으니 || [] 빈배열 처리 
+                setFollowers(followersData.filter(user => user !== null) as FollowInfo[]);
+                
+                const followingData = await getUsersData(user.data().following || []);
+                setFollowing(followingData.filter(user => user !== null) as FollowInfo[]);
+            }
             setLoading(false);
+        });
 
-            const unsubscribe = onSnapshot(userRef, (doc) => {
-                setUserInfo(doc.data() as UserProps);
-            });
+        return () => {
+            getUserSnap();
+        };
+    }
+}, [id]);
 
-            return () => {
-                unsubscribe();
-            };
-        }
-    }, [id]);
-
-    useEffect(() => {
-        if (userInfo) {
-            fetchFollowers();
-            fetchFollowing();
-        }
-    }, [userInfo]);
+const getUsersData = async (userIds: string[]) => {
+    // 
+    return await Promise.all(userIds.map(async (userId) => {
+        const userDoc = await getDoc(doc(db, 'Users', userId));
+        return userDoc.exists() ? (userDoc.data() as FollowInfo) : null;
+    }));
+};
 
     const TabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabIndex(newValue);

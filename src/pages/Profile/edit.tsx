@@ -12,7 +12,7 @@ import { ErrorToast, SuccessToast } from "Context/toastConfig";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc, updateDoc } from "firebase/firestore";
 import AppBarHeader from "components/LayOut/Header";
-import { UserProps,  } from "types/InterfaceTypes";
+import { UserProps  } from "types/InterfaceTypes";
 
 
 
