@@ -33,7 +33,7 @@ useEffect(() => {
         );
 
         const filterNotification = onSnapshot(notificationQuery, (snapshot) => {
-            const unreadNotifications = snapshot.docs.filter(doc => !doc.data().isRead);
+            const unreadNotifications = snapshot.docs.filter(unread => !unread.data().isRead);
             // notificationQuery 위에서 쿼리로 현재 로그인한 유저가 받은 알림만 골라낸 거에서 안 읽은 거만 골라내라 
             setUnreadCount(unreadNotifications.length);
         });

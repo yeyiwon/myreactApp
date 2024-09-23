@@ -54,10 +54,10 @@ export default function ChatRoom() {
                 // 얘는 지금 채팅방의 전체메세지 내용 
                 setMessages(newMessages);
 
-                const unreadMessages = newMessages.filter(msg => msg.senderId !== user.uid && !msg.isRead);
                 // 현재 로그인 한 사용자가 보낸 게 아닐 경우에 안 읽음 처리가 필요하고 
                 // 안 읽은 내용만 모아둘라고 unreadMessages 에 담기 
                 // 그 길이가 0 보다 길때 
+                const unreadMessages = newMessages.filter(msg => msg.senderId !== user.uid && !msg.isRead);
                 if (unreadMessages.length > 0) {
                     const batch = writeBatch(db);
                     // writeBatch 요친구가 한 번에 일처리르 해주는 아이라함
@@ -76,6 +76,7 @@ export default function ChatRoom() {
                 }
             });
 
+            // 상대방의 정보를 받기 위한 함수 
             const updateChatRoom = onSnapshot(chatRoomDoc, async (snapshot) => {
                 const chatRoomData = snapshot.data() as ChatRoomProps;
                 setChatRoom(chatRoomData);
@@ -125,6 +126,7 @@ export default function ChatRoom() {
                 if (chatRoomData.users) {
                     // 사용자 목록 확인하고 ! 유저 아이디 제외한 나머지 사용자 데려오기 
                     const participantIds = chatRoomData.users.filter(id => id !== user.uid);
+                    
                     const updates: { [key: string]: any } = {
                         lastMessage: newMessage,
                         lastMessageTimestamp: new Date(),

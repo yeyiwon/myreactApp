@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import ProfilePage from 'components/Profile';
+import ProfilePage from 'components/Profile/Profile';
 import PostList from 'components/Post/PostList';
 import AppBarHeader from "components/LayOut/Header";
 import AppBottomNav from 'components/LayOut/BottomNavigation';

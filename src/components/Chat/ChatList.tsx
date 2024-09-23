@@ -18,7 +18,7 @@ export default function ChatList() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const { CreateRoom } = useCreateChatRoom();
-  const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0); // 상태 추가
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0); 
 
 
 const formatTimestamp = (timestamp?: { seconds: number }) => {
@@ -45,8 +45,6 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
   }
 };
 
-
-
 // 채팅방 리스트 가져오는 함수 
 // 흐름 정리 : 채팅방 리스트를 가져올 땐 현재 로그인 된 사용자를 Users 라는 데이터베이스 컬렉션 안에서 골라온다 
 // 유저 정보를 userDoc 변수 안에 담아 놓고 onSnapshot을 하기 위해 async 한다 콜백 매개변수값으로 userSnap 
@@ -62,18 +60,27 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
           const chatRoomsCollection = collection(db, 'ChatRooms');
           
           const filterChatRooms = onSnapshot(chatRoomsCollection, async (chatRoomsSnapshot) => {
-            const rooms = chatRoomsSnapshot.docs.filter(doc => userChatRooms.includes(doc.id))
-              .map(doc => {
-                const roomData = doc.data();
+            const rooms = chatRoomsSnapshot.docs.filter(rooms => userChatRooms.includes(rooms.id))
+              .map(rooms => {
+                const roomData = rooms.data();
                 return {
-                  id: doc.id,
+                  id: rooms.id,
                   ...roomData,
                 }as ChatRoomProps;
               });
 
             const resolvedRooms = await Promise.all(
               rooms.map(async (room) => {
-                const otherUser = await getOtherUserInfo(room);
+                const otherUserId = room.users.find(id => id !== user.uid);
+                let otherUser: UserProps | null = null;
+                if(otherUserId){
+                  const otherUserRef = doc(db, "Users", otherUserId);
+                  const otherUserSnap = await getDoc(otherUserRef);
+                  console.log(otherUserSnap)
+                  if(otherUserSnap.exists()){
+                    otherUser = {id: otherUserId, ...otherUserSnap.data() }as UserProps;
+                  }
+                }
                 const lastMessage = room.lastMessage || '';
                 const unreadMessagesCount = room.unreadMessages?.[user.uid] || 0;
                 const lastMessageTimestamp = room.lastMessageTimestamp || { seconds: 0 };
@@ -87,14 +94,11 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
                 } as ChatRoomProps;
               })
             );
-
             const sortedRooms = resolvedRooms.sort((a, b) => {
               return (b.lastMessageTimestamp?.seconds || 0) - (a.lastMessageTimestamp?.seconds || 0);
             });
-
             setChatRooms(sortedRooms);
           });
-
               return () => {
                 filterChatRooms();
               };
@@ -111,7 +115,7 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
     getFollowingList();
     
   }, [user?.uid]);
-
+  
     // 실시간 데이터 업데이트: 사용자가 로그인할 때 새로운 데이터(예: 채팅방, 팔로우 리스트 등)를 가져와야 하니까. 현재 로그인되어있는 사용자 기준으로 실시간 업데이트가 되어야하기 때문에 user?.uid 가 되는 것임 
 
     // 만약 사용자가 로그아웃하거나 다른 사용자로 로그인하면, 기존에 저장된 데이터는 더 이상 유효하지 않으므로 새로운 사용자에 맞는 데이터를 로드 
@@ -142,21 +146,6 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
       }
     }
   };
-
-const getOtherUserInfo = async (room: ChatRoomProps): Promise<UserProps | null> => {
-  if (!user || !room.users) return null;
-
-  const otherUserId = room.users.find(userId => userId !== user.uid);
-  // find 메서드는 배열에서 주어진 조건을 만족하는 첫 번째 요소를 찾는 함수. user.uid와 같지 않은 첫 번째 사용자 ID를 반환하기 위해 find 사용함 .
-  if (!otherUserId) return null;
-
-  // find 로 찾아놓은 친구 Users 데이터 베이스에서 찾아오기
-  const otherUserDocRef = doc(db, 'Users', otherUserId);
-  const otherUserSnapshot = await getDoc(otherUserDocRef);
-
-  // 사용자 정보가 존재하면 반환
-  return otherUserSnapshot.exists() ? { id: otherUserId, ...otherUserSnapshot.data() } as UserProps : null;
-};
 
   const CloseDialog = () => {
     setOpen(false);

@@ -1,5 +1,5 @@
 
-import LoginForm from "components/LoginForm"
+import LoginForm from "components/User/LoginForm"
 import { useNavigate } from 'react-router-dom';
 import {IconButton } from '@mui/material';
 import { useContext } from "react";

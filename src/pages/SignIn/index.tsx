@@ -1,4 +1,4 @@
-import SignupForm from "components/SignupForm"
+import SignupForm from "components/User/SignupForm"
 
 export default function Signin(){
     return(
