@@ -1,16 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Avatar, Tabs, Tab, Button, Skeleton } from '@mui/material';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { arrayRemove, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { arrayRemove, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from 'firebaseApp';
 import ThemeContext from '../Context/ThemeContext';
 import AuthContext from 'Context/AuthContext';
 import AppBarHeader from './LayOut/Header';
-import { FollowInfo } from 'types/InterfaceTypes';
+import { FollowInfo, UserProps } from 'types/InterfaceTypes';
 import { useCreateChatRoom } from './Chat/useCreateChatRoom';
 
+
 export default function MyFollowingList() {
-    const { id } = useParams<{ id: string }>();
     const { theme } = useContext(ThemeContext);
     const { user } = useContext(AuthContext);
 
@@ -20,97 +20,127 @@ export default function MyFollowingList() {
     const [following, setFollowing] = useState<FollowInfo[]>([]);
     const navigate = useNavigate();
     const { CreateRoom } = useCreateChatRoom();
+    const [userInfo, setUserInfo] = useState<UserProps | null>(null);
 
+// -- 코드 흐름 --
+
+        // 
+
+
+        // 현재 로그인 된 사용자가 있는지 확인 
+        // 확인하고 문서가 있는지 확인 
+        // 문서가 있으면 UserProps 타입으로 유저 정보 useState에 반영
+        // 불러온 유저정보에서 팔로워 팔로잉의 데이터를 가져올 건데 
+        // 우선 팔로잉의 아이디 값을 가지고 팔로잉 팔로워의 정보를 또 가져오는 일을 해야돼 
+        // 그래서 잠깐 await getUserData()야 기다리고있어바 userSnap.data().followers || [] 데이터 좀 가져올게
+
+        // getUserData = async (id: string[]) => {현재 로그인된 사용자의 팔로잉 데이터에서 가져온 사용자 ID 배열을 가지고 
+        // Pwomise.all(id.map()) 매핑할거야
+        // Promise.all 인 이유는 Users 컬렉션 안에 팔로잉 팔로워 배열이 있음 
+        // 이게 아이디로만 저장을 해둠 
+        // 이렇게 안 하면 사용자의 프사가 바꼈을 때 바뀐 값을 가져오지 못함 
+        // 아이디를 가지고 아이디의 정보를 또 가져와야하는데 
+        // 아이디를 가져올 돋안 뱌열의 정보를 도는 것이기 때문에 ! 
+        // Promise.all(id.map())으로 매핑 된 거 가지고! 프로미스 올 하는동안 
+        // 그 해당 아이디의 유저의! 정보를! followInfo 타입으로 가져온다는거임
+
+        // 다 돌고 가져왔으면 
+        // followerData 얘가 await getUserData 잘 기다리고 있던 애가 
+        // setFollowers 라는 상태에 저장을 하고 UI 에 출력
+        // 다 불러와지면 setLoading(false); 을 falae로 처리하고 
+
+        // 얘는 실시간 onSnapshot 하던애라서 useEffect로 유저 아이디가 있을 때만 하는일인 건데 
+        // 굳이 할 일 없으면 그냥 자고이썽야 메모리 관리에 좋으니까 걍 자 return () => {
+                // getUserSnap();
+            // };
+
+    //};
 
     useEffect(() => {
+
+    if (!user) {
+        return; 
+        }
+
+        const userRef = doc(db, 'Users', user.uid);
+        const getUserSnap = onSnapshot(userRef, async (userSnap) => {
+            if (userSnap.exists()) {
+                setUserInfo(userSnap.data() as UserProps);
+                
+                const followerData = await getUserData(userSnap.data().followers || []);
+                console.log(followerData);
+                
+                setFollowers(followerData as FollowInfo[]);
+
+                const followingData = await getUserData(userSnap.data().following || []);
+                console.log(followingData)
+                setFollowing(followingData as FollowInfo[]);
+            }
+            setLoading(false);
+        });
+
+        return () => {
+            getUserSnap();
+        };
+
+    }, [user]);
+
+    const getUserData = async (id: string[]) => {
+        
+        return await Promise.all(id.map(async (id) => {
+            const userDoc = await getDoc(doc(db, "Users", id));
+            // 여기서 아이디는 팔로잉 리스트 안에 있는 팔로잉 유저의 아이디인 거임 
+            if (userDoc.exists()) {
+                // 데이터가 있다면 FollowInfo 타입으로 받아ㅓ 
+            const data = userDoc.data() as FollowInfo;
+            // 반환
+            return { ...data, id };
+        }
+            return null;
+        }));
+    }
+
+    const removeFollower = async (followerId: string) => {
+        if (!user) return; 
+
+        const userRef = doc(db, 'Users', user.uid);
+        const followerRef = doc(db, 'Users', followerId);
+
+            await updateDoc(userRef, {
+                followers: arrayRemove(followerId)
+            });
+
+            await updateDoc(followerRef, {
+                following: arrayRemove(user.uid)
+            });
+
+        setFollowers(followers.filter(f => f.id !== followerId));
+    };
+
+    const unfollow = async (followingUserId: string) => {
         if (!user) return;
 
-        const getUserInfo = async (userIds: string[]) => {
-            const userDetails: FollowInfo[] = [];
-            for (const userId of userIds) {
-                const userDoc = await getDoc(doc(db, 'Users', userId));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    userDetails.push({
-                        id: userId,
-                        displayName: userData.displayName || '',
-                        email: userData.email || '',
-                        photoURL: userData.photoURL || ''
-                    });
-                }
-            }
-            return userDetails;
-        };
+        const userRef = doc(db, 'Users', user.uid);
+        const followingUserRef = doc(db, 'Users', followingUserId);
 
-        const getFollowData = async () => {
-            try {
-                const userDoc = await getDoc(doc(db, 'Users', user.uid));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    const followingList = userData.following || [];
-                    const followersList = userData.followers || [];
-                    const followingDetails = await getUserInfo(followingList);
-                    const followersDetails = await getUserInfo(followersList);
+            await updateDoc(userRef, {
+                following: arrayRemove(followingUserId)
+            });
 
-                    setFollowing(followingDetails);
-                    setFollowers(followersDetails);
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+            // 상대방의 문서에서 현재 사용자 삭제
+            await updateDoc(followingUserRef, {
+                followers: arrayRemove(user.uid)
+            });
 
-        getFollowData();
-    }, [user]);
+            // 상태 업데이트
+            setFollowing(following.filter(f => f.id !== followingUserId));
+
+    };
 
     const TabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabIndex(newValue);
         const tab = newValue === 0 ? 'followers' : 'following';
         navigate(`?tab=${tab}`, { replace: true });
-    };
-
-    // 팔로잉 삭제: 나의 팔로잉 목록과 상대방의 팔로워 목록에서 제거
-    const Unfollow = async (userId: string) => {
-        if (!user) return;
-
-        const userRef = doc(db, 'Users', user.uid);
-        const targetRef = doc(db, 'Users', userId);
-
-        await updateDoc(userRef, {
-            following: arrayRemove(userId)
-        });
-
-        await updateDoc(targetRef, {
-            followers: arrayRemove(user.uid)
-        });
-
-        setFollowing(prev => prev.filter(f => f.id !== userId));
-        setFollowers(prev => prev.filter(f => f.id !== userId));
-    };
-
-    
-
-    // 팔로워 삭제: 상대방의 팔로워 목록과 나의 팔로워 목록에서 제거
-    const RemoveFollower = async (followerId: string) => {
-        if (!user) return;
-
-        const myRef = doc(db, 'Users', user.uid); // 나의 정보
-        const targetRef = doc(db, 'Users', followerId); // 팔로워의 정보
-
-        // 나의 팔로워 목록에서 상대방 제거
-        await updateDoc(myRef, {
-            followers: arrayRemove(followerId)
-        });
-
-        // 상대방의 팔로잉 목록에서 나를 제거
-        await updateDoc(targetRef, {
-            following: arrayRemove(user.uid)
-        });
-
-        setFollowers(prev => prev.filter(f => f.id !== followerId));
-        setFollowing(prev => prev.filter(f => f.id !== followerId));
     };
 
     return (
@@ -202,16 +232,12 @@ export default function MyFollowingList() {
                                             <div style={{ display: 'flex', gap: '10px' }}>
                                             <button
                                                 className='PostList_following'
-                                                onClick={() => CreateRoom(follower.id)} // 메시지 보내기
+                                                onClick={() => CreateRoom(follower.id)} 
                                             >
                                                 메시지
                                             </button>
-                                            <button
-                                            className='PostList_following'
-                                                onClick={() => RemoveFollower(follower.id)}
-                                            >
-                                                팔로워 삭제
-                                            </button>
+                                            <button className='PostList_following' onClick={() => removeFollower(follower.id)}>팔로워 삭제</button>
+
                                             </div>
                                         </li>
                                     )) : (
@@ -246,16 +272,12 @@ export default function MyFollowingList() {
                                             <div style={{ display: 'flex', gap: '10px' }}>
                                             <button
                                                 className='PostList_following'
-                                                onClick={() => CreateRoom(followingUser.id)} // 메시지 보내기
+                                                onClick={() => CreateRoom(followingUser.id)} 
                                             >
                                                 메시지
                                             </button>
-                                            <button
-                                                className='PostList_following'
-                                                onClick={() => Unfollow(followingUser.id)}
-                                            >
-                                                언팔로우
-                                            </button>
+                                            <button className='PostList_following' onClick={() => unfollow(followingUser.id)}>언팔로우</button>
+
                                             </div>
                                         </li>
                                     )) : (

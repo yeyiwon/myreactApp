@@ -26,12 +26,10 @@ export default function UserProfile() {
             CreateRoom(id);
         }
     };
-    // 프로필 유저의 데이터가 실시간으로 반영되도록 수정
     useEffect(() => {
         if (id) {
             const userRef = doc(db, 'Users', id);
 
-            // 실시간으로 유저 데이터를 가져오기 위해 onSnapshot 사용
             const filterUser = onSnapshot(userRef, (snapshot) => {
                 if (snapshot.exists()) {
                     setProfileUser(snapshot.data() as UserProps);
@@ -62,7 +60,6 @@ export default function UserProfile() {
         }
     }, [id]);
 
-    // 현재 사용자가 프로필 유저를 팔로우하고 있는지 확인하는 useEffect
     useEffect(() => {
         if (user?.uid && id) {
             const userDocRef = doc(db, 'Users', user.uid);

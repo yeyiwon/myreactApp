@@ -30,7 +30,6 @@ useEffect(() => {
         const notificationQuery = query(
             notificationsRef,
             where('uid', '==', user.uid)
-            //  현재 로그인한 유저가 받은 알림들만 찾아와 
         );
 
         const filterNotification = onSnapshot(notificationQuery, (snapshot) => {

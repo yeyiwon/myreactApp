@@ -53,7 +53,7 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
   const getChatRooms = () => {
     if (user?.uid) {
       const userDoc = doc(db, 'Users', user.uid);
-      // 유저의 정보를 userDoc에 담아놓고 바뀔 때마다 호출
+
       const filterUser = onSnapshot(userDoc, async (userSnap) => {
         if (userSnap.exists()) {
 

@@ -42,7 +42,7 @@ export default function UserFollowingList() {
 }, [id]);
 
 const getUsersData = async (userIds: string[]) => {
-    // 
+    
     return await Promise.all(userIds.map(async (userId) => {
         const userDoc = await getDoc(doc(db, 'Users', userId));
         return userDoc.exists() ? (userDoc.data() as FollowInfo) : null;
