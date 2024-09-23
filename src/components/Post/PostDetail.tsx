@@ -31,23 +31,31 @@ export default function PostDetail() {
     const {theme } = useContext(ThemeContext)
     const navigate = useNavigate();
     const [selectedComment, setSelectedComment] = useState<CommentsInterface | null>(null);
-    
+
+    const [likes, setLikes] = useState<string[]>([]);
+    const [likeCount, setLikeCount] = useState<number>(0);
+
+    // 게시물 불러오고 -> 불러오면서 댓글 배열도 불러오고 
+
     const getPost = async (postId: string) => {
-    if (!postId) return;
     setLoading(true);
 
     const PostDoc = await getDoc(doc(db, 'Posts', postId));
     const postData = PostDoc.data() as PostProps;
-    if (!postData) return;
-
     const authorDoc = await getDoc(doc(db, 'Users', postData.uid));
     const authorData = authorDoc.data();
+    // 겟 포스트 할 때 포스트 데이터에서 포스트아이디 -> 에 대한 데이터 포스트 프롭인터페이스 타입으로 받기
+    // 작성자 정보 작성자 정보가 혹시나 게시글 작성 이후에 변동이 될 수 있을 시 값을 반영하기 위해 Users 데이터에서 
+    // postData에 있는 유저아이디로 유저 정보 가져오기
 
+    // 댓글 정보를 담을때 정보를 모두 확인할 때까지 기다려라 배열이니까 
     const commentsWithAuthor = await Promise.all(
-        // 
+        // 포스트 데이터 안에 comments 배열을 매핑해 ?. 옵셔널 채이닝으로 없을 수도 있고 있을 수도 있고 를 나타냄
         postData.comments?.map(async (comment) => {
+            // 댓글을 작성한 유저 또한 값이 변경될 수 있음을 가정하여 Users 데이터 안에서 Uid 를가져오기 
             const commentAuthorDoc = await getDoc(doc(db, 'Users', comment.uid));
             const commentAuthorData = commentAuthorDoc.data();
+            // 데이터로 만들고 리턴
             return {
                 ...comment,
                 authorDisplayName: commentAuthorData?.displayName,
@@ -55,28 +63,50 @@ export default function PostDetail() {
             };
         }) || []
     );
+        setPost({
+            ...postData,
+            id: PostDoc.id,
+            authorDisplayName: authorData?.displayName,
+            authorProfileUrl: authorData?.photoURL,
+            comments: commentsWithAuthor,
+            });
 
-    setPost({
-        ...postData,
-        id: PostDoc.id,
-        authorDisplayName: authorData?.displayName,
-        authorProfileUrl: authorData?.photoURL,
-        comments: commentsWithAuthor,
-    });
-    setLoading(false);
+        // 좋아요 상태 업뎃을 위한 useState
+        setLikes(postData.likes || []);
+        setLikeCount(postData.likeCount || 0);
+        setLoading(false);
     };
 
     useEffect(() => {
     if (id) getPost(id);
-    }, [id, theme]);
+    }, [id]);
 
-    // 댓글 관련 로직 
-    const ClickOpen = (comment: CommentsInterface) => {
-        setSelectedComment(comment); 
-        setOpenDialog(true); 
+    // 게시글 삭제 
+    const DeleteClick = () => {
+    setOpenDialog(true);
     };
-    const Close = () => setOpenDialog(false);
-    
+    const ConfirmDelete = async () => {
+        try {
+            if (post?.imageUrl) {
+                const imageRef = ref(storage, post.imageUrl);
+                await deleteObject(imageRef);
+            }
+            if (post?.id) {
+                await deleteDoc(doc(db, "Posts", post.id));
+                SuccessToast('삭제 완료', theme);
+                navigate('/');
+            }
+        } catch (error) {
+            console.error('삭제 실패:', error);
+            ErrorToast('삭제 실패', theme);
+        }
+        setOpenDialog(false); 
+    };
+    const CancelDelete = () => {
+        setOpenDialog(false);
+    };
+
+    // 댓글
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setComment(e.target.value);
     };
@@ -87,6 +117,7 @@ export default function PostDetail() {
         if (post && post.id && user?.uid) {
             try {
                 const postRef = doc(db, 'Posts', post.id);
+                // 댓글을 데이터베이스에 저장할 때 필요한 정보를 담을 아이 CommentsObj
                 const CommentsObj = {
                     content: comment,
                     uid: user.uid,
@@ -102,7 +133,6 @@ export default function PostDetail() {
                     // createAt: new Date().toISOString(),
                 });
                     await getPost(post.id);
-
 
                 // 글 작성자와 댓글 작성자 확인
                 if (post.uid !== user?.uid) {
@@ -124,7 +154,13 @@ export default function PostDetail() {
             }
         }
     };
-
+    // 댓글 삭제 모달 
+    const ClickOpen = (comment: CommentsInterface) => {
+        setSelectedComment(comment); 
+        setOpenDialog(true); 
+    };
+    const Close = () => setOpenDialog(false);
+    
     const DeleteComment = async () => {
         if (selectedComment && post?.id) {
             try {
@@ -142,59 +178,37 @@ export default function PostDetail() {
         }
     };
 
-    const DeleteClick = () => {
-    setOpenDialog(true);
-    };
-
-    const ConfirmDelete = async () => {
-        try {
-            if (post?.imageUrl) {
-                const imageRef = ref(storage, post.imageUrl);
-                await deleteObject(imageRef);
-            }
-            if (post?.id) {
-                await deleteDoc(doc(db, "Posts", post.id));
-                SuccessToast('삭제 완료', theme);
-                navigate('/');
-            }
-        } catch (error) {
-            console.error('삭제 실패:', error);
-            ErrorToast('삭제 실패', theme);
-        }
-        setOpenDialog(false); 
-    };
-
-    const CancelDelete = () => {
-        setOpenDialog(false);
-    };
-
-    // 여까지 댓글 
-
+    // 좋아요 토글 함수
     const ToggleLike = async () => {
         if (!post?.id || !user?.uid) return;
+
+        const isLiked = likes.includes(user.uid);
+        const newLikes = isLiked 
+            ? likes.filter(uid => uid !== user.uid) 
+            : [...likes, user.uid];
+
+        setLikes(newLikes);
+        setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+
         const postRef = doc(db, 'Posts', post.id);
+        await updateDoc(postRef, {
+            likes: newLikes,
+            likeCount: newLikes.length,
+        });
 
-        const updateLikes = post?.likes?.includes(user?.uid)
-            ? { likes: arrayRemove(user?.uid), likeCount: (post.likeCount || 0) - 1 }
-            : { likes: arrayUnion(user?.uid), likeCount: (post.likeCount || 0) + 1 };
-
-        await updateDoc(postRef, updateLikes);
-
-                if (!post?.likes?.includes(user?.uid)) {
-                    await addDoc(collection(db, 'Notification'), {
-                        uid: id, // 알림을 받을 사용자 
-                        isRead: false,
-                        createdAt: new Date().toISOString(),
-                        url: `/user/${user.uid}`,
-                        content: '님이 회원님의 게시물에 좋아요를 남겼어요',
-                        authorUid: user?.uid,
-                        // 알림을 보낸 사용자 uid
-                    });
-            }
-
-
-        getPost(post.id); 
+        if (!isLiked) {
+            await addDoc(collection(db, 'Notification'), {
+                uid: post.uid,
+                isRead: false,
+                createdAt: new Date().toISOString(),
+                url: `/Posts/${post.id}`,
+                content: '님이 회원님의 게시물에 좋아요를 남겼어요',
+                authorUid: user?.uid,
+            });
+        }
     };
+
+
     return (
         <>
         <AppBarHeader title={post?.authorDisplayName} showBackButton={true}/>

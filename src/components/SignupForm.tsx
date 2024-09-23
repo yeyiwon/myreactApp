@@ -75,6 +75,10 @@ export default function SignupForm() {
         setErrors(validationErrors);
     };
 
+    // Dispatch: 상태를 업데이트하기 위한 함수 상태를 변경하는 명령을 보내는 역할
+
+    // SetStateAction: 이건 상태의 새로운 값을 설정하는 데 필요한 타입이야. 즉, 기존 상태를 업데이트할 때 사용할 수 있는 값의 타입 스트링 타입으로 받고 필드도 스트링 타입이고 
+
     const FuncChange = (setter: React.Dispatch<React.SetStateAction<string>>, field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setter(value);
@@ -182,7 +186,7 @@ const FuncSubmit = async () => {
         const userRef = doc(db, 'Users', user.uid);
         await setDoc(userRef, {
             displayName: name,
-            photoURL: profilePictureURL || null, // Firestore에 photoURL만 저장
+            photoURL: profilePictureURL || null,
             email: user.email
         });
 

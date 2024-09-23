@@ -44,7 +44,7 @@ export default function PostForm() {
     // 이미지 스토리지에 저장을 위해 `${user?.uid}/${uuidv4()}`; 스토리지 저장 경로/고유 id 값으로 저장
     const uploadImage = async (file: File) => {
     // uploadImage를 async로 처리하기 위해 file: File 인자로 받음
-    const key = `${user?.uid}/${uuidv4()}`;
+    const key = `/postimage/${user?.uid}/${uuidv4()}`;
     // key에 스토리지에 저장할 고유의 값을 만들어줌
     const storageRef = ref(storage, key);
     // storageRef를 사용해 uploadBytes로 파일을 스토리지에 업로드

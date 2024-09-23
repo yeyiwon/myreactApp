@@ -54,6 +54,9 @@ export default function MyFollowingList() {
                 // getUserSnap();
             // };
 
+        // 팔로잉 리스트 가져온걸로 ui 에 출력 시키고 언팔 팔로워 삭제 기능을 할 때 onClick 사용하면서 
+        // 인자로 받고 그 인자 받은 걸로 기능 하는거 
+
     //};
 
     useEffect(() => {
@@ -102,9 +105,11 @@ export default function MyFollowingList() {
 
     const removeFollower = async (followerId: string) => {
         if (!user) return; 
+        // 팔로워 아이디 가져다가
 
-        const userRef = doc(db, 'Users', user.uid);
-        const followerRef = doc(db, 'Users', followerId);
+            const userRef = doc(db, 'Users', user.uid);
+            // 현재 로그인 된 유저 아이디랑 팔로워 아이디 가져오고 
+            const followerRef = doc(db, 'Users', followerId);
 
             await updateDoc(userRef, {
                 followers: arrayRemove(followerId)
@@ -114,7 +119,11 @@ export default function MyFollowingList() {
                 following: arrayRemove(user.uid)
             });
 
-        setFollowers(followers.filter(f => f.id !== followerId));
+            setFollowers(followers.filter(follower => follower.id !== followerId));
+            // 필터의 기능 활용 = 주로 삭제할 때 가장 중요한 
+            // 배열을 돌면서 어진 조건이 참인 요소들만으로 새로운 배열을 만드는 기능 
+            // followerId 와 일치하지 않는 애들만 남겨놓고 상태업뎃
+            
     };
 
     const unfollow = async (followingUserId: string) => {
@@ -127,14 +136,11 @@ export default function MyFollowingList() {
                 following: arrayRemove(followingUserId)
             });
 
-            // 상대방의 문서에서 현재 사용자 삭제
             await updateDoc(followingUserRef, {
                 followers: arrayRemove(user.uid)
             });
 
-            // 상태 업데이트
-            setFollowing(following.filter(f => f.id !== followingUserId));
-
+            setFollowing(following.filter(following => following.id !== followingUserId));
     };
 
     const TabChange = (event: React.SyntheticEvent, newValue: number) => {

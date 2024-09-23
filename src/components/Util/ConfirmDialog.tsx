@@ -3,7 +3,7 @@ import { Dialog, DialogActions, DialogContent, Button, Fade } from '@mui/materia
 import { TransitionProps } from '@mui/material/transitions';
 
 const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
+    props: TransitionProps & {
     children: React.ReactElement<any, any>;
   },
   ref: React.Ref<unknown>,

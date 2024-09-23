@@ -10,6 +10,14 @@ import Skeleton from '@mui/material/Skeleton';
 import { PostProps } from 'types/InterfaceTypes';
 import { formatDate } from '../Util/dateUtil';
 
+
+// -- 코드 흐름 -- 
+// 현재 로그인 한 사용자가 팔로잉 하는 유저 불러오고 
+// 유저가 id 값으로 팔로잉하는 유저를 저장하고있기 때문에 
+// 팔로잉하는 유저가 쓴 글 / 그 유저의 정보 등을 또 불러오는 절차가 필요하기 때문에 
+// promise.all 로 기다리면서 팔로잉하는 유저가 쓴 글 / 그 유저의 정보 이런 걸 매핑하면서 가져온다
+// 가져오고 출력
+
 export default function PostList() {
     const [posts, setPosts] = useState<PostProps[]>([]);
     const [loading, setLoading] = useState(true);
@@ -24,7 +32,6 @@ export default function PostList() {
 
     const getUserFollowing = async () => {
         if(user){
-            // 현재 로그인 한 사용자가 있을 때만 팔로잉 목록 가져오기 
             const userRef = doc(db, 'Users', user?.uid);
             const userSnap = await getDoc(userRef);
             return userSnap.data()?.following || [];
@@ -40,43 +47,50 @@ export default function PostList() {
     if (user) { 
         const following = await getUserFollowing();
         const postsRef = collection(db, "Posts");
-        // 포스트 목록 가져오고 
+        // 전체 포스트 불러오기
         const postsQuery = query(postsRef, orderBy('createAt', "desc"));
+        // 전체 포스트를 내림차순으로 정렬하기
         const querySnapshot = await getDocs(postsQuery);
-        const getPosts: PostProps[] = [];
+        
+        // 겟포스트 할 때 포스트 프롭 타입을 우선 빈 배여로 해놓고 여기에 담겨질 동안 기다렸려 
+        const getPosts: PostProps[] = await Promise.all(
+                // 밑에서 매핑할 때까지 좀 기다렸다가 
+                // postsQuery로 정렬해놓은애를 querySnapshot 이 친구로 받아서 겟독을 할건데 
+                // 정렬해놓은 거 다 가져온 것 중에서 
+                querySnapshot.docs.map(async postList => {
+                    // 포스트 리스트로 변환을 먼저 시키는동안 기다렸다가 매핑을 할 거고 
+                const postData = postList.data() as PostProps; // 포스트 프롭 타아ㅣㅂ으로 가져오기 
+                const authorId = postData?.uid; // 작성자 아이디
+                const authorRef = doc(db, 'Users', authorId);
+                const authorSnap = await getDoc(authorRef);
+                console.log(authorSnap)
+                const authorData = authorSnap.data();
+                console.log(authorData)
 
-        for (const postList of querySnapshot.docs) {
-            const postData = postList.data() as PostProps;
-            // console.log(postData) // console.log(querySnapshot) 여기서 뜨는 엄청난 정보들 docSnap.data() as PostProps 타입 변환해서 받아옴
-            const authorId = postData?.uid;
-            // console.log(authorId) // 작성자의 아이디
-            const authorRef = doc(db, 'Users', authorId);
-            const authorSnap = await getDoc(authorRef);
-            const authorData = authorSnap.data();
-            // 만약에 ~~ user.uid === authorId: 현재 사용자가 작성자와 같은 경우 = 내가쓴 글이거나 following.includes(authorId)) 내 팔로잉 리스트에서 작성자의 아이디가 있는 경우라면은 팔로잉 탭에서 보이게 하고 그게 아니면 그냥 전체 탭에서 전체 다출력 해 
-            if (tab === 'following' && (user.uid === authorId || following.includes(authorId))) {
-                getPosts.push({
+                return {
                     ...postData,
                     id: postList.id,
                     authorDisplayName: authorData?.displayName,
                     authorProfileUrl: authorData?.photoURL,
-                });
-            } else if (tab === 'all') {
-                getPosts.push({
-                    ...postData,
-                    id: postList.id,
-                    authorDisplayName: authorData?.displayName,
-                    authorProfileUrl: authorData?.photoURL,
-                });
+                };
+            })
+        );
+
+        const filteredPosts = getPosts.filter(post => {
+            if (tab === 'following') {
+                return user.uid === post.uid || following.includes(post.uid);
             }
-        }
+            return true;
+        });
 
-        setPosts(getPosts);
+        setPosts(filteredPosts);
     } else {
         console.error("포스트 못가져옴");
     }
     setLoading(false);  
+    
 };
+
 
 
     return (
