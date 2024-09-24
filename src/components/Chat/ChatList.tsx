@@ -95,6 +95,11 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
               })
             );
             const sortedRooms = resolvedRooms.sort((a, b) => {
+              // 기존 메세지와 새로 온 메세지 
+              // sort알고리즘
+              // 타임스탬프 기준 최근이면 최근일 수록 큰 값이기 때문에 내림차순 정렬을 하기 위해서 b - a 해야함 
+              // [1,2,3].sort((a,b) => { b - a }) == 321 // 내림차순 큰 값이 먼저 
+              // [1,2,3].sort((a,b) => { a - b }) == 123 // 오름차순 작은 값이 먼저 
               return (b.lastMessageTimestamp?.seconds || 0) - (a.lastMessageTimestamp?.seconds || 0);
             });
             setChatRooms(sortedRooms);
@@ -184,7 +189,7 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                   {otherUser?.photoURL ? (
                     <Avatar
-                      src={otherUser.photoURL}
+                      src={otherUser.photoURL || ''}
                       alt={`${otherUser.displayName}`}
                       style={{borderRadius: '50%', width: '40px', height: '40px'}}
                     />
