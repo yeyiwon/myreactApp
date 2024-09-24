@@ -1,0 +1,1518 @@
+body,
+h1,
+h2,
+h3,
+p,
+div,
+ul,
+li,
+dl,
+dt,
+dd,
+form,
+fieldset,
+legend,
+label {
+  margin: 0;
+  padding: 0
+
+}
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+ul,
+li {
+  list-style: none
+}
+
+
+  a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+fieldset,
+img {
+  border: 0 none
+}
+
+input,
+button {
+  vertical-align: middle
+}
+
+button {
+  cursor: pointer
+}
+
+.mainPage{
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+}
+
+.mainpagetitle{
+  color: #3D3A50;
+}
+.dark .mainpagetitle{
+  color: #F7F7F7;
+}
+
+
+  .mainPageBTN{
+        border: 1px solid #580EF6;
+        font-weight: bold;
+        font-size: 12px;
+        box-shadow: 0 0 5px rgba(88, 14, 246, 0.2);
+        border-radius: 20px;
+        width: 150px;
+        /* box-shadow: ; */
+        height: 40px;
+        padding: 8px 12px;
+}
+
+/* 프로필 페이지 */
+.Profile_section{
+  margin: 0 auto;
+  gap: 11px;
+  /* max-width: 500px; */
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1em;
+  box-sizing: border-box;
+  position: relative;
+}
+.profile_area{
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  
+}
+.profile_name{
+  color: #1A1C22;
+  font-size: 18px;
+  font-weight: bold;
+}
+.profile_email{
+  color: #666;
+}
+
+/* login */
+.FormClass {
+  margin-top: 30px;
+  height: 100vh;
+  /* height: calc(100vh - 150px); */
+  display: flex;
+  padding: 1em;
+  box-sizing: border-box;
+  flex-direction: column;
+  /* justify-content: center;x */
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+}
+
+.form_link {
+  color: #580EF6;
+  font-weight: bold;
+}
+
+.form_link:hover,
+.form_link:focus {
+  color: black;
+}
+/* 텍스트 필드 커스텀 */
+.customtextField .MuiOutlinedInput-root {
+  color: #1A1C22 !important;
+  
+  font-weight: bold;
+}
+
+.customtextField .MuiInputLabel-root {
+  color: #333333 !important;
+}
+
+.customtextField .MuiInputLabel-root.Mui-focused {
+  color: #580EF6 !important;
+}
+
+.customtextField .MuiOutlinedInput-notchedOutline {
+  border-color: #1A1C22;
+  /* box-shadow: rgba(0, 0, 0, 0.24) 0px 2px 8px 0px; */
+
+}
+
+
+.customtextField .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #580EF6 !important;
+}
+
+.customtextField .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #580EF6 !important;
+}
+
+.customtextField .MuiInputLabel-asterisk {
+  display: none;
+}
+
+login-title {
+  font-size: 24px;
+  /* font-weight: bold; */
+  margin-bottom: 20px;
+}
+
+.social-login {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  align-items: center;
+
+}
+
+.social-title {
+  font-size: 14px;
+  margin: 20px 0;
+  color: #1A1C22;
+  /* font-weight: bold; */
+}
+.dark .social-title{
+  color: #F7F7F7;
+}
+.dark .Divider{
+  color: #F7F7F7;
+}
+
+.social_box{
+  padding: 1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+}
+
+.form_link {
+  color: #580EF6;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.form_link:hover {
+  text-decoration: underline;
+}
+
+
+.EditorContent {
+  /* 초기 높이 설정 */
+  min-height: 300px;
+  border: 1px solid #ccc;
+  /* 기본 테두리 스타일 */
+}
+
+
+/* 회원가입 */
+
+.title_box {
+  max-width: 500px;
+  margin: 0 auto;
+  height: 150px;
+  background: #F7F7F7;
+  font-weight: bold;
+  /* text-align: center; */
+  color: #333333;
+  position: relative;
+  display: flex;
+
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+
+}
+
+.StepperBox {
+  width: 100vw;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.completeBTN {
+  background: #580EF6 !important; 
+  color: #fff !important;
+  width: 100px;
+  font-weight: bold !important;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 2px 8px 0px;
+  padding: 0.5em;
+  box-sizing: border-box;
+}
+
+.completeBTN:hover {
+  background: #1A1C22;
+}
+
+.formClassBox{
+    text-align: center;
+    padding: 0.7em;
+    box-sizing: border-box;
+    max-width: 500px;
+    margin: 0 auto;
+
+}
+
+.signupProfile{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.linkform{
+  font-size: 14px;
+}
+
+/* .MuiStepLabel-label {
+  font-size: 11px !important;
+} */
+.MuiBox-root css-0{
+  width: 500px !important;
+  margin: 0 auto !important;
+}
+
+.PostcontextBoxTitle{
+      max-width: 130px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #F7F7F7;
+      font-size: 1.5rem;
+  }
+
+.hidden{
+  display: none;
+}
+
+
+.LikeCommentBox{
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  /* background: pink; */
+  /* padding: 0.5em; */
+  box-sizing: border-box;
+  /* border-top: 1px solid #F7F7F7; */
+}
+.ProfileEditBtn{
+  background: #580EF6;
+  height: 50px;
+
+}
+.ChatBtn:disabled {
+
+      background-color: #d3d3d3;
+      color: #a9a9a9;
+      cursor: not-allowed;
+
+}
+.dark .ChatBtn{
+  background: #580EF6;
+}
+
+.FocusColor{
+  outline: none;
+  border-color: #580EF6;
+}
+
+.ImageUploadPreview {
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border-radius: 5px; */
+  position: relative;
+  overflow: hidden;
+
+}
+
+.profile_components {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 64px;
+}
+
+.profileImgUploadPrev{
+  /* margin-bottom: 50px 0; */
+  position: relative;
+  overflow: hidden;
+  width: 150px;
+  height: 150px;
+
+  border-radius: 50%;
+}
+
+.PreviewButtons{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.7);
+    transition: opacity 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profileImgUploadPrev:hover .PreviewButtons {
+  opacity: 1;
+}
+
+.profile-container {
+  position: relative;
+  display: inline-block;
+}
+
+
+.ImageUploadPreviewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 1 / 1;
+  transition: background 0.3s;
+}
+
+
+.ImageUploadPreviewButtons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.ImageUploadPreview:hover .ImageUploadPreviewButtons {
+  opacity: 1;
+}
+.postContainer{
+  max-width: 1000px;
+  margin: 0 auto;
+  /* padding: 1em; */
+  box-sizing: border-box;
+}
+.post_list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  padding: 0;
+  margin: 0;
+}
+
+.post_list li{
+  /* aspect-ratio: 1 / 1; */
+    /* 정사각형 유지 */
+    position: relative;
+    /* 이미지와 그 외 콘텐츠 배치 조정 */
+    overflow: hidden;
+    /* 이미지가 벗어나지 않도록 */
+
+}
+
+.post_box {
+  aspect-ratio: 1 / 1;
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 2px 8px 0px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+}
+
+.post_box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.post_box::before{
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  /* display: block; */
+  background: rgba(0, 0, 0, 0.2);
+}
+
+
+.postList_textBox{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1em;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+}
+.AuthorArea{
+  width: 100%;
+  padding: 0.8em 0.5em;
+  box-sizing: border-box;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Detail_AuthorArea{
+      width: 100%;
+      margin: 0.6em 0;
+      padding: 0 0.5em;
+      box-sizing: border-box;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+}
+
+.AuthorArea_Author{
+  font-size: 14px;
+  color: #1A1C22;
+
+  font-weight: bold;
+}
+.AuthorArea_Date{
+  color: #3D3A50;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.posts_edit{
+  display: flex;
+  /* gap: 10px; */
+}
+
+.TimeStamp{
+  color: #3D3A50;
+  font-size: 11px;
+}
+
+
+/* postdetail */
+
+.PostDetail{
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  /* padding: 1em; */
+}
+.postuploaduser{
+  /* padding: 1em; */
+  padding: 0 0.8em;
+  box-sizing: border-box;
+  display: flex;
+  /* gap: 10px; */
+  flex-direction: column;
+}
+.PostDetailtitle{
+  width: 100%;
+  color: #3D3A50;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  text-overflow:inherit;
+  font-size: 26px;
+  font-weight: bold;
+  white-space: nomal;
+  word-wrap: nowrap;
+  overflow: hidden;
+  /* white-space: pre-wrap; */
+}
+.PostDetailcontext{
+  /* white-space: pre-wrap; */
+  position: relative;
+  /* padding: 0.5em; */
+
+}
+
+.PostDetailContext img{
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.PostDetail_At_box{
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.PostDetail_AuthorArea{
+  display: flex;
+  gap: 10px;
+  padding: 15px 0;
+  align-items: center;
+}
+
+.PostDetailDate{
+  color: #3D3A50;
+}
+
+.DialogCustomm{
+  border-radius: 8px;
+
+}
+.PostNav{
+  display: flex;
+  height: 50px;
+  gap: 10px;
+  max-width: 500px;
+
+  /* padding: 1em; */
+  box-sizing: border-box;
+  align-items: center;
+  font-size: 16px;
+  color: #777;
+  cursor: pointer;
+  padding: 1em;
+}
+.postNav_Active{
+  color: #333333;
+  font-weight: bold;
+  /* border-bottom: 2px solid #333; */
+}
+
+.PostDetailContext_text{
+  padding: 0 1em;
+
+}
+
+.btnBox {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.Profile_following{
+    border: none;
+      background: #580ef6;
+      color: #F7F7F7;
+      font-weight: bold;
+      font-size: 12px;
+      box-shadow: 0 0 5px rgba(88, 14, 246, 0.2);
+      border-radius: 8px;
+      width: 150px;
+      /* box-shadow: ; */
+      padding: 8px 12px;
+}
+.Profile_follow{
+    border: 1px solid #580EF6;
+    background: #F7F7F7;
+    color: #580EF6;
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: 0 0 5px rgba(88, 14, 246, 0.2);
+    border-radius: 8px;
+    width: 150px;
+    /* box-shadow: ; */
+    padding: 8px 12px;
+  }
+  .Profile_msgBtn{
+        border: none;
+          background: #580EF6;
+          color: #F7F7F7;
+          font-weight: bold;
+          font-size: 12px;
+          box-shadow: 0 0 5px rgba(88, 14, 246, 0.2);
+          border-radius: 8px;
+          width: 150px;
+          /* box-shadow: ; */
+          padding: 8px 12px;
+  }
+
+
+.PostList_following{
+  border: none;
+  background: #580EF6;
+  color: #F7F7F7;
+  font-weight: bold;
+  font-size: 12px;
+  box-shadow: 0 0 5px rgba(88, 14, 246, 0.2);
+  border-radius: 20px;
+  /* width: 60px; */
+  /* box-shadow: ; */
+  padding: 8px 12px;
+}
+.PostList_follow{
+    border: 1px solid #580EF6;
+    background: #F7F7F7;
+    color: #580EF6;
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: 0 0 5px rgba(88, 14, 246, 0.2);
+    border-radius: 20px;
+      /* width: 60px; */
+      /* box-shadow: ; */
+    padding: 8px 12px;
+}
+
+.follower_links_btn{
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  vertical-align:middle;
+}
+
+.PostLength{
+    font-weight: 600;
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+    /* vertical-align: middle; */
+}
+
+
+/* 댓글 */
+.Comments_list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.Comments_list{
+  padding: 1em;
+  display: flex;
+  margin-bottom: 100px;
+  flex-direction: column;
+}
+.Comments_Author{
+  display: flex;
+  /* align-items: center; */
+  gap: 10px;
+}
+.Comment_flex{
+  display: flex;
+  /* width: 400px; */
+  gap: 10px;
+}
+
+.Comment_Area {
+    margin-top: 20px;
+    padding: 1em;
+    box-sizing: border-box;
+    /* background: #f9f9f9; */
+}
+
+.Comment_Area h3 {
+  margin: 10px 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.followname{
+  font-weight: bold;
+  font-size: 14px;
+
+}
+.followemail{
+  color: #a9a9a9;
+  font-size: 12px;
+}
+.dark .followname {
+  color: #efefef;
+}
+
+
+/* 알림  */
+.NotificationArea{
+  padding: 1em;
+  color: rgb(247, 247, 247);
+  padding-bottom: 64px;
+}
+.NotificationArea {
+  display: flex;
+  flex-direction: column;
+  /* height: 100vh; */
+}
+
+.NotificationContent {
+  flex: 1;
+  scroll-snap-type: none;
+  padding-bottom: 56px;
+  /* padding: 16px; */
+}
+
+.NotificationList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.NotificationItem {
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 8px 0px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 1em;
+}
+
+.NotificationItemskel {
+  border-radius: 8px;
+  /* box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 8px 0px; */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 1em;
+}
+
+.dark .NotificationItem{
+  background: rgba(247, 247, 247, 0.8);
+}
+
+.NotificationAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.NotificationText {
+  font-weight: 600;
+  flex: 1;
+}
+
+.noPostlist{
+  text-align: center;
+  color: #777;
+  margin-top: 20px;
+  height: 150px;
+}
+.dark .noPostlist{
+  color: #F7F7F7;
+}
+
+.NoNotifications {
+  text-align: center;
+  color: #777;
+  margin-top: 20px;
+}
+
+.dark .NoNotifications{
+  color: #F7F7F7;
+}
+
+.searchInput {
+  /* padding: 0.3em; */
+  box-sizing: border-box;
+  background: #efefef;
+  display: flex;
+  border-radius: 8px;
+  gap: 5px;
+  padding: 5px 15px;
+  align-items: center;
+
+}
+.Searchinputarea{
+  font-size: 14px;
+  border: none !important;
+  resize: none !important;
+  outline: none !important;
+  width: 100%;
+  height: 40px;
+  background: transparent;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+
+.box {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 64px;
+  /* height: 100vh; */
+}
+
+.chatContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* padding-top: 15px; */
+  padding-bottom: 80px;
+  /* height: 100vh; */
+  /* background: #F7F7F7; */
+}
+
+.lastmsg{
+  color: #666;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 230px;
+  text-overflow: ellipsis;
+}
+
+.chatingmsgBox{
+  box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  color: #1A1C22;
+  border-radius: 8px;
+  font-size: 14px;
+  max-width: 180px;
+  margin-bottom: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.dark .chatingmsgBox{
+  /* color: #F7F7F7; */
+}
+.dark .TimeStamp{
+  display: flex;
+  align-items: center;
+  color: #F7F7F7;
+}
+
+
+
+
+.ChatTextarea{
+    border: none;
+    background-color: #efefef;
+    overflow-y: hidden;
+    font-size: 14px;
+    /* height: 50px; */
+    flex: 1;
+    /* width: 100%; */
+    padding: 0.5em;
+    line-height: 1em;
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+    resize: none;
+}
+
+.dark .newChat{
+  color: #F7F7F7;
+}
+.newChat{
+  background: transparent;
+  font-size: 16px;
+  color: #3D3A50;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  vertical-align: middle;
+  outline: none;
+  padding: 0.5em;
+  margin-bottom: 20px;
+  cursor: pointer;
+
+}
+.ChatBtn{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  background: #1A1C22;
+  color: #fff;
+  box-shadow: 0 0 5px rgba(88, 14, 246, 0.2);
+  transition: all 0.2s ease-in-out;
+
+}
+
+.okbtn{
+  height: 40px;
+  color: #F7F7F7 !important;
+  background-color :#580EF6 !important;
+}
+.okbtn:disabled{
+  background-color: rgba(88, 14, 246, 0.3) !important;
+}
+
+.textareabox_area{
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 0.5em;
+    box-sizing: border-box;
+}
+
+.dark .textareabox{
+  background: #1A1C22;
+  transition: all 0.2s ease-in-out;
+}
+
+.textareabox{
+  /* box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.2); */
+  box-sizing: border-box;
+  /* height: 70px; */
+  background-color: #F7F7F7;
+  border-radius: 8px;
+  display: flex;
+  padding: 0.5em;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+  gap: 10px;
+}
+
+.Comment{
+  background: #f9f9f9;
+  width: calc(100% - 50px);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  box-sizing: border-box;
+  background-color: #fff;
+  resize: none;
+
+  outline: none;
+}
+.SearchAreaTitle{
+  font-size: 18px;
+  font-weight: 600;
+  color: #3D3A50;  
+  margin-bottom: 20px;
+}
+
+.dark .SearchAreaTitle{
+  color: #F7F7F7;
+}
+.Comment:focus {
+  border-color: #580Ef6;
+  box-shadow: 0 0 5px rgba(88, 14, 246, 0.2);
+}
+
+.Comment_Text{
+    font-size: 14px;
+    color: #3D3A50;
+    overflow-wrap: break-word;
+
+    word-break: break-word;
+
+    white-space: normal;
+    line-height: 1.5;
+
+    max-width: 260px;
+
+    display: block;
+
+}
+
+.Comment_Item{
+  margin: 20px 0;
+}
+
+.Comment_Item li{
+  display: flex;
+  align-items: flex-start;
+  margin: 10px 0;
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+
+.Comment_ProfileImage {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.Comment_Content {
+  flex: 1;
+  position: relative;
+}
+
+.Comment_Header {
+  display: flex;
+  /* justify-content: space-between; */
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.usebox{
+  display: flex;
+  gap: 10px;
+}
+
+.userEmailName{
+  display: flex;
+  flex-direction: column;
+}
+
+.Comment_Author {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.Comment_Time {
+  font-size: 12px;
+  color: #888;
+}
+.Noti_Time{
+  font-size: 12px;
+  color: #3D3A50;
+}
+
+
+
+
+.Comment_textArea {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  /* padding: 1em; */
+  align-items: center;
+}
+.Comment_text{
+  background: #efefef;
+  display: flex;
+  padding: 1em;
+  width: 100%;
+  border-radius: 8px;
+  height: auto;
+}
+.CommentArea{
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  border: none;
+  overflow-y: auto;
+  resize: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.commentbutton {
+  background: #580Ef6;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  box-shadow: 0 0 5px rgba(88, 14, 246, 0.2);
+}
+
+.commentbutton:hover {
+  background: #4b00d4;
+}
+.commentbutton:disabled {
+  background-color: #d3d3d3;
+  color: #a9a9a9;
+  cursor: not-allowed;
+}
+
+.ProfileFollowing_list{
+    display: flex;
+    background-color: #3D3A50;
+    /* align-items: flex-start; */
+    margin: 10px 0;
+}
+.posting_followerBox{
+  display: flex;
+  /* padding: 0.5em; */
+  color: #3D3A50;
+  gap: 20px;
+  /* font-size: 18px !important; */
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+
+}
+.ProfiePost_list_title{
+  color: #3D3A50;
+  margin: 10px 0;
+  padding: 0.5em;
+  background: #F7F7F7;
+  position: sticky;
+  top: 56px;
+  left: 0;
+  z-index: 10;
+
+}
+
+
+/* dark mode */
+
+.thememodeBtn{
+  cursor: pointer;
+}
+
+.light {
+  transition: all 0.25s linear;
+  background: #F7F7F7;
+  min-height: 100vh;
+}
+
+.dark {
+  transition: all 0.25s linear;
+  background: #1A1C22;
+  min-height: 100vh;
+}
+
+.dark .AuthorArea_Author, .dark .AuthorArea_Date{
+  color: #F7F7F7;
+}
+
+
+.dark .PostNav, .dark .postNav_Active{
+  color: #580EF6;
+}
+.dark .post_box{
+  /* box-shadow: rgba(255, 255, 255, 0.24) 0px 2px 8px 0px; */
+  background: #F7F7F7;
+  /* border: 1px solid #fff; */
+}
+.dark .PostDetailtitle, .dark .PostDetail_AuthorArea, .dark .PostDetailContext, .dark .PostDetailDate{
+  color: #F7F7F7 !important;
+}
+.dark .PostDetailContext_text{
+  color: #F7F7F7 !important;
+}
+.dark .customtextField .MuiOutlinedInput-notchedOutline{
+  color: #F7F7F7 !important; 
+}
+
+.dark .customtextField .MuiInputLabel-root{
+  color: #F7F7F7 !important;
+}
+
+.dark .login-form h3{
+  color: #F7F7F7;
+}
+
+.dark .linkform{
+  color: #F7F7F7;
+}
+.dark .form_link:hover,
+.form_link:focus {
+  color: #F7F7F7;
+}
+.dark .profile_email, .dark .profile_name{
+  color: #F7F7F7;
+}
+
+.dark .customtextField .MuiOutlinedInput-root{
+  color: #F7F7F7 !important;
+}
+.dark .customtextField .MuiOutlinedInput-notchedOutline{
+  border-color: #F7F7F7;
+}
+.dark .completeBTN {
+  background: #580EF6;
+}
+
+.dark .completeBTN:hover {
+  
+}
+
+.dark .PostLength{
+  color: #F7F7F7;
+}
+.dark .follower_links_btn{
+  color: #F7F7F7;
+}
+.dark .ProfiePost_list_title{
+  color: #F7F7F7;
+  background: #1A1C22;
+}
+
+.follower_links_btn:hover {
+  color: #580EF6;
+
+  outline: none;
+}
+
+.PostingTitle{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 45px;
+  font-size: 30px;
+}
+
+
+.Noti_Text{
+      font-size: 14px;
+        color: #1A1C22;
+        overflow-wrap: break-word;
+      
+        word-break: break-word;
+      
+        white-space: normal;
+        line-height: 1.5;
+  
+        display: block;
+}
+
+.Searchresults{
+  padding: 0.5em;
+  box-sizing: border-box;
+}
+.SearchArea{
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+}
+
+.dark .title_box{
+  background: #580EF6;
+  color: #fff;
+}
+
+.dark .PostDetailcontext{
+  color: #F7F7F7;
+}
+.dark .Comment_Area h3{
+  color: #F7F7F7;
+}
+
+.dark .Comment_Author{
+  color: #F7F7F7;
+}
+.dark .Comment_Time{
+  color: #F7F7F7;
+}
+.dark .Comment_Text{
+  color: #F7F7F7;
+}
+/*  */
+.TabBox_section{
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ProfileMypostContainer {
+  padding: 5px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ProfiePost_list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  /* gap을 설정하여 아이템 간의 간격 조정 */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.Profile_post_box {
+  background-color: #ffffff;
+  border-radius: 5px;
+  aspect-ratio: 1 / 1;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 8px 0px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Profile_post_box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 이미지가 부모 요소의 크기에 맞게 잘리며 정사각형 유지 */
+  display: block;
+}
+
+.Profile_post_box::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.Profile_post_box_title {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  color: #F7F7F7;
+  white-space: nowrap;
+  padding: 5px;
+  font-size: 15px;
+}
+
+.porofile_components {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.likeCount {
+  font-size: 16px;
+  color: #3D3A50;
+  margin-right: 5px;
+  /* font-weight: bold; */
+}
+
+.dark .likeCount{
+  color: #F7F7F7;
+}
+
+.visitorPostingBtn{
+  padding: 10px 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.VisitorList{
+  display: flex;
+  flex-direction: column;
+}
+
+.VisitorListitem{
+  width: 100%;
+  /* height: 50px; */
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 2px 8px 0px;
+  display: flex;
+  align-items: center;
+  padding: 10px 10px;
+  box-sizing: border-box;
+}
+.visitor_ProfileImage{
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+.visitor_Header {
+  display: flex;
+  /* justify-content: space-between; */
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.visitor_Author {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+
+
+
+/* 채팅  */
+
+
+
+@media (max-width: 768px) {
+
+  .ImageUploadPreview:hover .ImageUploadPreviewButtons,
+  .ImageUploadPreview:focus-within .ImageUploadPreviewButtons {
+    opacity: 1;
+  }
+
+  .profileImgUploadPrev:focus-within .PreviewButtons{
+    opacity: 1;
+  }
+    .PostcontextBoxTitle {
+        font-size: 1.2rem;
+    }
+    .post_list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+      .Comment {
+        
+          font-size: 16px;
+      }
+    
+
+    
+
+  .ImageUploadPreviewButtons {
+    display: flex;
+  }
+
+  }
+  @media (max-width: 480px){
+    .PostcontextBoxTitle{
+      max-width: 200px;
+      font-size: 1.5rem;
+    }
+    .post_list{
+      grid-template-columns: 1fr;
+    }
+      .Comment {
+        font-size: 16px;
+    }
+    .chatingmsgBox{
+      padding: 8px;
+      font-size: 12px;
+    }
+  }
