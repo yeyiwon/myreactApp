@@ -11,6 +11,7 @@ import ThemeContext from '../../Context/ThemeContext';
 import { NotificationType, UserProps } from 'types/InterfaceTypes';
 import { FaRegTrashAlt } from "react-icons/fa";
 
+
 export default function Notification() {
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
     const [selectedNotification, setSelectedNotification] = useState('')
