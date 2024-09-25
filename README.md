@@ -1,9 +1,11 @@
 ![header](https://capsule-render.vercel.app/api?type=waving&color=gradient&height=250&text=MyReactApp&fontAlign=50)
 
 # 🙈 Project  
-    - 개발 기간 : 2024.09.02 ~ 2024.09.21
     - 분류 : 개인 프로젝트
-    - 배포 주소 : https://mysnsproject-77f84.web.app/
+    - 개발 기간 : 2024.09.02 ~ 2024.09.21
+    
+
+### 👩🏻‍💻 배포 주소 : https://mysnsproject-77f84.web.app/
 
 ### 테스트용 아이디 
 
@@ -17,8 +19,8 @@ npm install
 ```
 
 ## 📌 목차
-1. [목표 및 주요 기능](#목표-및-주요-기능)
-2. [기술적 의사 결정](#기술적-의사결정)
+1. [목표 및 주요 기능](#😎-목표-및-주요-기능)
+2. [기술적 의사 결정](#⚒️-기술적-의사-결정)
 3. [피피티 자료](#프로젝트-피피티)
 
 ## 😎 목표 및 주요 기능
@@ -61,7 +63,7 @@ React 프레임워크를 사용하여 개발을 진행했고, React Native for w
 
 ## 프로젝트 피피티
 
-제 프로젝트 소개가 담긴 피피티 파일입니다 ! 
+제 프로젝트 소개가 더욱 자세히 담긴 피피티 파일입니다 ! 
 
 [📝 PDF 파일](MySNSpptfile(최종).pdf)
 
