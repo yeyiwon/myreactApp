@@ -49,7 +49,7 @@ React 프레임워크를 사용하여 개발을 진행했고, React Native for w
 
 `Firebase` 와의 데이터 통신에도 인터페이스를 정의하여, 백엔드와 프론트엔드 간의 타입 불일치 문제를 예방할 수 있어서 타입스크립트를 사용하여 개발하였습니다 ! 
 
-**데이터, 서버, 프레임워크**
+**데이터, 서버**
 
 ![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34)
 ![NPM](https://img.shields.io/badge/NPM-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white)
