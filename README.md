@@ -65,6 +65,8 @@ React 프레임워크를 사용하여 개발을 진행했고, React Native for w
 
 제 프로젝트 소개가 더욱 자세히 담긴 피피티 파일입니다 ! 
 
-[📝 PDF 파일](MySNSpptfile(최종).pdf)
+[📝 완성 PDF 파일](MySNSpptfile(최종).pdf)
 
-[✏️ PPT 파일](MySNSpptfile(최종).pptx)
+[✏️ 완성 PPT 파일](MySNSpptfile(최종).pptx)
+
+[👩🏻‍💻 기획 단계 시 작성한 파일](MySNS기획서.pptx)
