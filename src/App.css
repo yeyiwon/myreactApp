@@ -779,6 +779,7 @@ login-title {
   box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 8px 0px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   margin-bottom: 12px;
   padding: 1em;

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Avatar, IconButton, Tooltip, Button, Dialog, DialogActions, DialogContent, DialogTitle, Tabs, Tab } from '@mui/material';
-import { getAuth, signOut } from 'firebase/auth';
+import { deleteUser, getAuth, signOut } from 'firebase/auth';
 import { app, db } from 'firebaseApp';
 import ThemeContext from '../../Context/ThemeContext';
 import { BiDoorOpen } from "react-icons/bi";
@@ -9,8 +9,10 @@ import { SuccessToast, ErrorToast } from '../../Context/toastConfig';
 import AuthContext from 'Context/AuthContext';
 import { PostProps } from 'types/InterfaceTypes';
 import AppBottomNav from 'components/LayOut/BottomNavigation';
-import { collection, doc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { arrayRemove, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import ConfirmDialog from '../Util/ConfirmDialog';
+import { IoSettingsOutline } from "react-icons/io5";
+import { deleteObject, getStorage, ref } from '@firebase/storage';
 
 export default function ProfilePage() {
     const { theme } = useContext(ThemeContext);
@@ -20,7 +22,7 @@ export default function ProfilePage() {
     const [followingCount, setFollowingCount] = useState<number>(0);
     const [followersCount, setFollowersCount] = useState<number>(0);
     const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
-
+    const [openDeleteAccountDialog, setOpenDeleteAccountDialog] = useState(false)
     const iconColor = theme === 'light' ? '#3D3A50' : '#F7F7F7';
 
     useEffect(() => {
@@ -71,6 +73,13 @@ export default function ProfilePage() {
         Close();
     };
 
+    const ClickDeleteAccountOpen = () => setOpenDeleteAccountDialog(true);
+    const CloseDeleteAccount = () => setOpenDeleteAccountDialog(false);
+
+
+
+
+
     return (
         <div className='profile_components'>
             <div className='Profile_section'>
@@ -118,12 +127,33 @@ export default function ProfilePage() {
                         팔로잉 {followingCount}
                     </div>
                 </div>
-                <div>
+                <div style={{ display: 'flex', gap: '10px' }}>
                     <button className='Profile_msgBtn'
                         onClick={() => navigate('/Profile/edit')}
                     > 
                         프로필 수정 
                     </button>
+
+                        {/* <Tooltip title="회원탈퇴">
+                            <IconButton
+                            sx={{ 
+                                color: iconColor, 
+                                fontWeight: 'bold', 
+                                padding: 0 
+                            }}
+                            onClick={ClickDeleteAccountOpen}  // 모달 열기
+                            >
+                            <IoSettingsOutline size={20} />
+                            </IconButton>
+                        </Tooltip> */}
+
+                        {/* <ConfirmDialog
+                        // open={openDeleteAccountDialog}
+                        content="정말 탈퇴 하시겠습니까?"
+                        // onConfirm={DeleteAccount}
+                        // onCancel={CloseDeleteAccount}
+                        /> */}
+
                 </div>
             </div>
             <div>

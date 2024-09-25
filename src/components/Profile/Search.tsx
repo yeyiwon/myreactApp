@@ -30,11 +30,11 @@ export default function Search() {
             where("email", "<=", searchText.toLowerCase() + "\uf8ff")
         );
 
-        const displayNameQuery = query(
-            usersSearch,
-            where("displayName", ">=", searchText.toLowerCase()),
-            where("displayName", "<=", searchText.toLowerCase() + "\uf8ff")
-        );
+        // const displayNameQuery = query(
+        //     usersSearch,
+        //     where("displayName", ">=", searchText.toLowerCase()),
+        //     where("displayName", "<=", searchText.toLowerCase() + "\uf8ff")
+        // );
 
         // 사용자 검색 결과를 저장할 배열 배열로 받는 건 내가 이름과 이메일 둘다 검색 가능하게 해두어서 그럼 
         const allUsers: UserProps[] = [];
@@ -52,20 +52,20 @@ export default function Search() {
             // 검색 결과 보여주기
         });
 
-        const filterDisplayName = onSnapshot(displayNameQuery, (diplayNameSnapshot) => {
-            diplayNameSnapshot.forEach((UserDoc) => {
-                const data = UserDoc.data() as UserProps;
+        // const filterDisplayName = onSnapshot(displayNameQuery, (diplayNameSnapshot) => {
+        //     diplayNameSnapshot.forEach((UserDoc) => {
+        //         const data = UserDoc.data() as UserProps;
                 
-                if (!allUsers.find(user => user.id === UserDoc.id)) { 
-                    allUsers.push({ ...data, id: UserDoc.id });
-                }
-            });
-            setResults(allUsers);
-        });
+        //         if (!allUsers.find(user => user.id === UserDoc.id)) { 
+        //             allUsers.push({ ...data, id: UserDoc.id });
+        //         }
+        //     });
+        //     setResults(allUsers);
+        // });
 
         return () => {
             filterEmail();
-            filterDisplayName();
+            // filterDisplayName();
         };
     }, [searchText]);
 

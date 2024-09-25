@@ -1,18 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { collection, query, where, orderBy, onSnapshot, doc, getDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, doc, getDoc, updateDoc, writeBatch, deleteDoc } from 'firebase/firestore';
 import { db } from 'firebaseApp';
 import AuthContext from 'Context/AuthContext';
 import AppBarHeader from '../LayOut/Header';
 import AppBottomNav from '../LayOut/BottomNavigation';
-import { Avatar, Skeleton } from '@mui/material';
+import { Avatar, IconButton, Skeleton, Tooltip } from '@mui/material';
 import { formatDate } from '../Util/dateUtil';
 import { Link } from 'react-router-dom';
 import ThemeContext from '../../Context/ThemeContext';
 import { NotificationType, UserProps } from 'types/InterfaceTypes';
+import { FaRegTrashAlt } from "react-icons/fa";
 
 export default function Notification() {
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
-    // 알림 리스트를 저장하는 상태 
+    const [selectedNotification, setSelectedNotification] = useState('')
     const { user } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const { theme } = useContext(ThemeContext);
@@ -98,6 +99,9 @@ export default function Notification() {
         }
     }, [user]);
 
+
+
+
     return (
         <div className="NotificationArea" style={{ paddingBottom: '56px' }}>
             <AppBarHeader title="알림" showBackButton={true} />
@@ -117,11 +121,12 @@ export default function Notification() {
                 ) : notifications.length > 0 ? (
                     <ul className="NotificationList">
                         {notifications.map(notification => (
-                            <Link key={notification.id} to={notification.url}>
-                                <li className="NotificationItem">
+                                <li key={notification.id} className="NotificationItem">
+                                    <Link to={notification.url}>
+                                    <div style={{ display: 'flex', gap: '10px'}}>
                                     <Avatar 
-                                        src={notification.authorProfileUrl} 
-                                        alt="User" 
+                                        src={notification.authorProfileUrl || ''} 
+                                        alt="UserProfile" 
                                         className="NotificationAvatar" 
                                     />
                                     <div className="Noti_Text">
@@ -132,8 +137,20 @@ export default function Notification() {
                                             {formatDate(notification.createdAt)}
                                         </span>
                                     </div>
+                                    </div>
+                                    </Link>
+                                                                                                                                                                {/* <Tooltip title='삭제'>
+                                            <IconButton sx={{
+                                                color: '#1A1C22',
+                                            }}
+                                            onClick={() => DeleteNoti(notification.id)}
+                                            >
+                                            <FaRegTrashAlt size={16} />
+                                                </IconButton>
+                                        </Tooltip> */}
                                 </li>
-                            </Link>
+
+                            
                         ))}
                     </ul>
                 ) : (

@@ -159,9 +159,13 @@ export default function ChatRoom() {
     };
     
     const groupedMessages = messages.reduce((acc, msg, index) => {
+        // 해당 날짜의 첫번째 메세지
+        // 이 날짜에 날짜가 존재하는지 
+        // 현재 메세지의 인덱스 
         const date = new Date(msg.timestamp.seconds * 1000);
-        const dateString = formatDate(date);
+        const dateString = formatDate(date); // 날짜 데이터 타입 변환 포맷 
         const prevDate = index > 0 ? formatDate(new Date(messages[index - 1].timestamp.seconds * 1000)) : null;
+        // 이전 메세지의 값이 0보다 크면 
 
         if (prevDate !== dateString) {
             if (!acc[dateString]) {

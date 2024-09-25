@@ -23,6 +23,7 @@ import { TiArrowUp } from "react-icons/ti";
 
 export default function PostDetail() {
     const [openDialog, setOpenDialog] = useState(false);
+    const [openPostDialog, setOpenPostDialog] = useState(false);
     const [post, setPost] = useState<PostProps | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [comment, setComment] = useState<string>('');
@@ -83,8 +84,9 @@ export default function PostDetail() {
 
     // 게시글 삭제 
     const DeleteClick = () => {
-    setOpenDialog(true);
+    setOpenPostDialog(true);
     };
+
     const ConfirmDelete = async () => {
         try {
             if (post?.imageUrl) {
@@ -102,8 +104,9 @@ export default function PostDetail() {
         }
         setOpenDialog(false); 
     };
+
     const CancelDelete = () => {
-        setOpenDialog(false);
+        setOpenPostDialog(false);
     };
 
     // 댓글
@@ -275,9 +278,8 @@ export default function PostDetail() {
                                         </Tooltip>
 
                                         <ConfirmDialog
-                                            open={openDialog}
-                                        
-
+                                            open={openPostDialog}
+                                    
                                             content="정말로 게시글을 삭제하시겠습니까?"
                                             onConfirm={ConfirmDelete}
                                             onCancel={CancelDelete}

@@ -25,13 +25,10 @@ const formatTimestamp = (timestamp?: { seconds: number }) => {
   if (!timestamp) {
     return 'No date'; 
   }
-
   const date = new Date(timestamp.seconds * 1000);
   const now = new Date();
-  
   // 오늘 날짜
   const isToday = date.toDateString() === now.toDateString();
-  
   // 시간 포맷팅
   const options: Intl.DateTimeFormatOptions = {
     hour: '2-digit',
